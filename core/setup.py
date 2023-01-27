@@ -1,11 +1,6 @@
 import core
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
-    version=core.__version__,
-
-    name="PyTube",
-    description="Youtube converter library.",
-    packages=find_packages(),
-    install_requires=['pytube']
+    version=core.__version__
 )
