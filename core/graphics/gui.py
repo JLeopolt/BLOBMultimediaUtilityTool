@@ -24,10 +24,6 @@ class App(tk.Tk):
         # tab controls
         self.notebook = ttk.Notebook(self)
 
-        # Grid fills entire space
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-
         # create tabs
         self.blob_tab = ttk.Frame(self.notebook)
         self.youtube_tab = youtube_tab.YoutubeTab()

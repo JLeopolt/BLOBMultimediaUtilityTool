@@ -11,5 +11,4 @@ def get_software_details():
 
 
 if __name__ == '__main__':
-    print(get_software_details())
     gui.App().mainloop()
