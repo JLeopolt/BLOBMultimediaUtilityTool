@@ -13,7 +13,7 @@ def get_date_time():
 class Console(tk.scrolledtext.ScrolledText):
 
     def __init__(self, container):
-        super().__init__(container, undo=True)
+        super().__init__(container, undo=True, wrap='word')
 
         # disable manual input
         self.disable()
@@ -40,6 +40,12 @@ class Console(tk.scrolledtext.ScrolledText):
     # Enables all forms of modification of the Text widget.
     def enable(self):
         self.configure(state='normal')
+
+    # Clears the entire console, then reposts the software details info.
+    def clear(self):
+        self.enable()
+        self.delete('1.0', 'end')
+        self.print(core.__main__.get_software_details())
 
     def print(self, msg):
         self.enable()

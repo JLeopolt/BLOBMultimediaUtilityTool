@@ -1,43 +1,17 @@
 import time
+import tkinter as tk
 import urllib
 from idlelib.tooltip import Hovertip
 from threading import Thread
-from tkinter import ttk, font
+from tkinter import ttk
 from urllib import request
 from PIL import Image, ImageTk
-import tkinter as tk
-import tkinter.scrolledtext as scrolledtext
-
+from pytube.exceptions import RegexMatchError
 import core.services.youtube
+from core.graphics.tabs.youtube.util import utils
+from core.graphics.tabs.youtube import scontrols as shortcuts
 from core.graphics.common import console as cs
-
-
-# Creates a descriptor title for a download stream.
-def get_source_title(source):
-    title = "."
-
-    # Get the resolution for video, or bit-rate for audio.
-    if source.type == 'video':
-        title += source.mime_type.replace("video/", "") + " "
-        title += source.resolution + " " + str(source.fps) + "fps"
-    elif source.type == 'audio':
-        title += source.mime_type.replace("audio/", "") + " "
-        title += source.abr
-
-    # Add the file size in parentheses
-    title += " (" + str(round(source.filesize_mb, 2)) + " mb)"
-
-    return title
-
-
-# Converts a number of seconds into a timestamp of HH:MM:SS (HH is ignored unless > 0)
-def convert_seconds_to_duration(seconds):
-    m, s = divmod(seconds, 60)
-    h, m = divmod(m, 60)
-    duration = str(m) + ":" + str(s)
-    if h > 0:
-        return str(h) + ":" + duration
-    return duration
+from core.services import files
 
 
 class YoutubeTab(ttk.Frame):
@@ -53,6 +27,8 @@ class YoutubeTab(ttk.Frame):
     # The tabs for the download options, 'Video' and 'Audio'
     video_download_option_tab = None
     audio_download_option_tab = None
+
+    progress_bar = None
 
     # Console for debugging
     console = None
@@ -80,7 +56,7 @@ class YoutubeTab(ttk.Frame):
         # Instantiate the full frame
         input_frame = ttk.LabelFrame(self, text='Input')
 
-        rich_control_frame = self.build_rich_controls_panel(input_frame)
+        rich_control_frame = shortcuts.Shortcuts(input_frame, self.console)
         rich_control_frame.pack(side='top', fill='x')
 
         # Label for input field
@@ -103,39 +79,17 @@ class YoutubeTab(ttk.Frame):
 
         return input_frame
 
-    @staticmethod
-    def build_rich_controls_panel(input_frame):
-        # Robust controls panel
-        special_control_frame = ttk.Frame(input_frame)
-
-        run_button = ttk.Button(special_control_frame, text='\u25B6', width=3)
-        run_button.pack(side='left', padx=1)
-        Hovertip(run_button, '@Run: Executes the current script.')
-
-        stop_button = ttk.Button(special_control_frame, text='\u25A0', width=3)
-        stop_button.pack(side='left', padx=1)
-        Hovertip(stop_button, '@Stop: Terminates current process.')
-
-        clear_button = ttk.Button(special_control_frame, text='\u274C', width=3)
-        clear_button.pack(side='left', padx=1)
-        Hovertip(clear_button, '@Clear: Performs @Stop, then\nclears Output frame.')
-
-        # Separator
-        ttk.Separator(special_control_frame, orient='vertical').pack(side='left', padx=8, fill='y')
-
-        audio_hr_button = ttk.Button(special_control_frame, text='\u266B', width=3)
-        audio_hr_button.pack(side='left', padx=1)
-        Hovertip(audio_hr_button, '@Audio.HR: Automatically downloads\naudio-only at highest resolution.')
-
-        video_hr_button = ttk.Button(special_control_frame, text='\u2B73', width=3)
-        video_hr_button.pack(side='left', padx=1)
-        Hovertip(video_hr_button, '@Video.HR: Automatically downloads\nvideo w/ audio at highest resolution.')
-
-        return special_control_frame
-
     # Returns the placeholder frame where YouTube video metadata and download options are shown.
     def build_output_frame(self):
         output_frame = ttk.LabelFrame(self, text='Output')
+
+        self.progress_bar = ttk.Progressbar(
+            output_frame,
+            orient='horizontal',
+            mode='indeterminate'
+        )
+        self.progress_bar.pack(side='top', expand=True, fill='x', anchor='nw')
+        self.progress_bar.start()
 
         # Metadata frame
         self.youtube_metadata_frame = ttk.LabelFrame(output_frame, text='Metadata')
@@ -143,11 +97,15 @@ class YoutubeTab(ttk.Frame):
 
         # Download Options frame
         download_type_frame = ttk.LabelFrame(output_frame, text='Download Type')
-        download_type_frame.pack(side='right', fill='both')
+        download_type_frame.pack(side='right', fill='x')
+
         # Create Notebook and Tabs for Download Options
         dl_options_nb = ttk.Notebook(download_type_frame)
         self.video_download_option_tab = ttk.Frame(dl_options_nb)
+        tk.Scrollbar(self.video_download_option_tab, orient="vertical").pack(side='right', fill='y')
         self.audio_download_option_tab = ttk.Frame(dl_options_nb)
+        tk.Scrollbar(self.audio_download_option_tab, orient="vertical").pack(side='right', fill='y')
+
         # Set up the Notebook for Download Options
         dl_options_nb.add(self.video_download_option_tab, text='Video')
         dl_options_nb.add(self.audio_download_option_tab, text='Audio')
@@ -159,6 +117,11 @@ class YoutubeTab(ttk.Frame):
         self.youtube_metadata_frame.pack_forget()
         self.output_frame = self.build_output_frame()
 
+    # Opens a thread which will update the Youtube download options list.
+    def schedule_youtube_video_access(self):
+        worker = Thread(target=self.load_youtube_video)
+        worker.start()
+
     # Returns a frame with the console.
     def build_console(self):
         # Instantiate the frame
@@ -169,26 +132,24 @@ class YoutubeTab(ttk.Frame):
 
         return console_frame
 
-    def download_youtube_video(self):
+    def load_youtube_video(self):
         # Get the YouTube link from user input
         youtube_link = self.link_entry_field.get()
         if youtube_link == "":
             self.console.printError("No link was provided.")
             return
 
-        # progress_bar = ttk.Progressbar(
-        #     self,
-        #     orient='horizontal',
-        #     mode='indeterminate',
-        #     length=500
-        # )
-        # progress_bar.pack()
-        # progress_bar.start()
-
         start_time = time.time()
 
         # Get the stream from pytube after getting the link.
-        youtube = core.services.youtube.get_YouTube_object(youtube_link)
+        try:
+            youtube = core.services.youtube.get_YouTube_object(youtube_link)
+        except RegexMatchError:
+            self.console.printError("Input is not a valid URL.")
+            return
+        except (Exception,) as e:
+            self.console.printError(str(e))
+            return
 
         self.update_youtube_metadata_frame(youtube)
 
@@ -202,9 +163,6 @@ class YoutubeTab(ttk.Frame):
         self.console.printSuccess("Retrieved all available download streams for \"" + youtube.title + "\" ("
                                   + str(round(time.time() - mid_time, 2)) + "s).")
 
-        # Stop progress bar, and remove it
-        # progress_bar.stop()
-
     # Updates the YouTube metadata frame with video's thumbnail, title, and duration.
     def update_youtube_metadata_frame(self, youtube):
         # The thumbnail image
@@ -215,32 +173,11 @@ class YoutubeTab(ttk.Frame):
         # Video metadata
         metadata = tk.Frame(self.youtube_metadata_frame)
         metadata.pack(side='left', anchor='nw')
-        tk.Label(metadata, text="\"" + youtube.title + "\"").pack(side='top', expand=True, anchor='nw')
-        tk.Label(metadata, text="Duration: " + convert_seconds_to_duration(youtube.length))\
+        tk.Label(metadata, text="\"" + youtube.title + "\"", wraplength=300).pack(side='top', expand=True, anchor='nw')
+        tk.Label(metadata, text="Duration: " + utils.convert_seconds_to_duration(youtube.length)) \
             .pack(side='top', expand=True, anchor='nw')
         tk.Label(metadata, text=str(youtube.views) + " Views").pack(side='top', expand=True, anchor='nw')
         tk.Label(metadata, text="Author: " + youtube.author).pack(side='top', expand=True, anchor='nw')
-
-    def display_youtube_download_options(self, youtube):
-        # Add all Video download options, sorted by Resolution
-        for source in youtube.streams.filter().order_by('resolution').__reversed__():
-            # Generate the button representing this download option, and add it to the video tab.
-            rb = ttk.Button(
-                self.video_download_option_tab,
-                text=get_source_title(source)
-            )
-            # Add the button
-            rb.pack(expand=True, fill='both')
-
-        # Add all Audio download options, sorted by bit-rate.
-        for source in youtube.streams.filter(only_audio=True).order_by('abr').__reversed__():
-            # Generate the button representing this download option, and add it to the audio tab.
-            rb = ttk.Button(
-                self.audio_download_option_tab,
-                text=get_source_title(source)
-            )
-            # Add the button
-            rb.pack(expand=True, fill='both')
 
     # Creates a Tkinter PhotoImage from a thumbnail URL.
     def get_youtube_thumbnail(self, thumbnail_url):
@@ -260,7 +197,42 @@ class YoutubeTab(ttk.Frame):
 
         return thumbnail
 
-    # Opens a thread which will update the Youtube download options list.
-    def schedule_youtube_video_access(self):
-        worker = Thread(target=self.download_youtube_video)
-        worker.start()
+    def display_youtube_download_options(self, youtube):
+        # Add all Video download options, sorted by Resolution
+        for source in youtube.streams.filter().order_by('resolution').__reversed__():
+            # Generate the button representing this download option, and add it to the video tab.
+            rb = ttk.Button(
+                self.video_download_option_tab,
+                text=utils.get_source_title(source),
+                command=lambda t=source.itag: self.download_stream(youtube, t),
+            )
+            # Add the button
+            rb.pack(expand=True, fill='both')
+
+        # Add all Audio download options, sorted by bit-rate.
+        for source in youtube.streams.filter(only_audio=True).order_by('abr').__reversed__():
+            # Generate the button representing this download option, and add it to the audio tab.
+            rb = ttk.Button(
+                self.audio_download_option_tab,
+                text=utils.get_source_title(source),
+                command=lambda t=source.itag: self.download_stream(youtube, t),
+            )
+            # Add the button
+            rb.pack(expand=True, fill='both')
+
+    def download_stream(self, youtube, itag):
+        # May prompt the user for a save dir before downloading
+        selected_loc = files.get_save_location()
+
+        if selected_loc is None:
+            self.console.printError('Could not download file. No save location was specified.')
+
+        self.console.printInfo('Downloading media now..')
+
+        # Download the file
+        start_time = time.time()
+        filepath = youtube.streams.get_by_itag(itag).download(output_path=selected_loc)
+
+        # print a success message
+        self.console.printSuccess('Downloaded media as \"' + filepath + "\". (" +
+                                  str(round(time.time() - start_time, 2)) + "s)")
