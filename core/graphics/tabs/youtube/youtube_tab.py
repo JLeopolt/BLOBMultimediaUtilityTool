@@ -2,7 +2,7 @@ import time
 import urllib
 from idlelib.tooltip import Hovertip
 from threading import Thread
-from tkinter import ttk
+from tkinter import ttk, font
 from urllib import request
 from PIL import Image, ImageTk
 import tkinter as tk
@@ -80,14 +80,8 @@ class YoutubeTab(ttk.Frame):
         # Instantiate the full frame
         input_frame = ttk.LabelFrame(self, text='Input')
 
-        # Robust controls panel
-        special_control_frame = ttk.Frame(input_frame)
-
-        # run button
-        run_button = ttk.Button(special_control_frame, text='\u25B6', width=3)
-        run_button.pack(side='left', padx=2)
-        Hovertip(run_button, '@Run: Executes current script.')
-        special_control_frame.pack(side='top', fill='x')
+        rich_control_frame = self.build_rich_controls_panel(input_frame)
+        rich_control_frame.pack(side='top', fill='x')
 
         # Label for input field
         url_label = ttk.Label(input_frame, text='YouTube URL:')
@@ -98,14 +92,9 @@ class YoutubeTab(ttk.Frame):
         self.link_entry_field.pack(side='left', padx=3, expand=True, fill='x')
 
         # load button
-        load_button = ttk.Button(input_frame, text='Load', command=self.schedule_youtube_video_access)
-        Hovertip(load_button, 'Get the download options\nfor this video.')
+        load_button = ttk.Button(input_frame, text='Load', width=6, command=self.schedule_youtube_video_access)
+        Hovertip(load_button, '@Load: Loads the YouTube video from URL.')
         load_button.pack(side='left', padx=3)
-
-        # clear button
-        clear_button = ttk.Button(input_frame, text='X', width=2, command=self.reset_output_frame)
-        Hovertip(clear_button, 'Clear the currently\nloaded video.')
-        clear_button.pack(side='left')
 
         # photoimage = tk.PhotoImage(file="core/assets/orrin.png")
         # imgbutton = tk.Button(input_frame, image=photoimage)
@@ -113,6 +102,36 @@ class YoutubeTab(ttk.Frame):
         # imgbutton.pack()
 
         return input_frame
+
+    @staticmethod
+    def build_rich_controls_panel(input_frame):
+        # Robust controls panel
+        special_control_frame = ttk.Frame(input_frame)
+
+        run_button = ttk.Button(special_control_frame, text='\u25B6', width=3)
+        run_button.pack(side='left', padx=1)
+        Hovertip(run_button, '@Run: Executes the current script.')
+
+        stop_button = ttk.Button(special_control_frame, text='\u25A0', width=3)
+        stop_button.pack(side='left', padx=1)
+        Hovertip(stop_button, '@Stop: Terminates current process.')
+
+        clear_button = ttk.Button(special_control_frame, text='\u274C', width=3)
+        clear_button.pack(side='left', padx=1)
+        Hovertip(clear_button, '@Clear: Performs @Stop, then\nclears Output frame.')
+
+        # Separator
+        ttk.Separator(special_control_frame, orient='vertical').pack(side='left', padx=8, fill='y')
+
+        audio_hr_button = ttk.Button(special_control_frame, text='\u266B', width=3)
+        audio_hr_button.pack(side='left', padx=1)
+        Hovertip(audio_hr_button, '@Audio.HR: Automatically downloads\naudio-only at highest resolution.')
+
+        video_hr_button = ttk.Button(special_control_frame, text='\u2B73', width=3)
+        video_hr_button.pack(side='left', padx=1)
+        Hovertip(video_hr_button, '@Video.HR: Automatically downloads\nvideo w/ audio at highest resolution.')
+
+        return special_control_frame
 
     # Returns the placeholder frame where YouTube video metadata and download options are shown.
     def build_output_frame(self):
