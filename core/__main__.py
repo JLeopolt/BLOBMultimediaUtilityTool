@@ -1,4 +1,4 @@
-# An open-source multimedia utility downloader and converter tool which can download media sources from the Web.
+# A multimedia utility downloader and converter tool which can download media sources from the Web.
 
 import core
 import core.graphics.gui as gui

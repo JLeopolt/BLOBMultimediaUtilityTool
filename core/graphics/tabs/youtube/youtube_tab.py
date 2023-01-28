@@ -1,10 +1,12 @@
 import time
 import urllib
+from idlelib.tooltip import Hovertip
 from threading import Thread
 from tkinter import ttk
 from urllib import request
 from PIL import Image, ImageTk
-from idlelib.tooltip import Hovertip
+import tkinter as tk
+import tkinter.scrolledtext as scrolledtext
 
 import core.services.youtube
 from core.graphics.common import console as cs
@@ -117,8 +119,8 @@ class YoutubeTab(ttk.Frame):
         output_frame = ttk.LabelFrame(self, text='Output')
 
         # Metadata frame
-        self.youtube_metadata_frame = ttk.LabelFrame(output_frame, text='YouTube')
-        self.youtube_metadata_frame.pack(side='left', expand=True, fill='both')
+        self.youtube_metadata_frame = ttk.LabelFrame(output_frame, text='Metadata')
+        self.youtube_metadata_frame.pack(side='left', expand=True, fill='both', anchor='nw')
 
         # Download Options frame
         download_type_frame = ttk.LabelFrame(output_frame, text='Download Type')
@@ -186,25 +188,19 @@ class YoutubeTab(ttk.Frame):
 
     # Updates the YouTube metadata frame with video's thumbnail, title, and duration.
     def update_youtube_metadata_frame(self, youtube):
-        # Set the title of the video as Label frame
-        self.youtube_metadata_frame.config(text=youtube.title)
-
         # The thumbnail image
         thumbnail_image = self.get_youtube_thumbnail(youtube.thumbnail_url)
         thumbnail = ttk.Label(self.youtube_metadata_frame, image=thumbnail_image)
-        thumbnail.pack()
+        thumbnail.pack(side='left', anchor='nw')
 
-        # The video's title
-        title = ttk.Label(self.youtube_metadata_frame, text="Views: "+str(youtube.views))
-        title.pack()
-
-        # The video duration
-        duration = ttk.Label(self.youtube_metadata_frame, text="Duration: " + convert_seconds_to_duration(youtube.length))
-        duration.pack()
-
-        # The author
-        author = ttk.Label(self.youtube_metadata_frame, text="Poster: " + youtube.author)
-        author.pack()
+        # Video metadata
+        metadata = tk.Frame(self.youtube_metadata_frame)
+        metadata.pack(side='left', anchor='nw')
+        tk.Label(metadata, text="\"" + youtube.title + "\"").pack(side='top', expand=True, anchor='nw')
+        tk.Label(metadata, text="Duration: " + convert_seconds_to_duration(youtube.length))\
+            .pack(side='top', expand=True, anchor='nw')
+        tk.Label(metadata, text=str(youtube.views) + " Views").pack(side='top', expand=True, anchor='nw')
+        tk.Label(metadata, text="Author: " + youtube.author).pack(side='top', expand=True, anchor='nw')
 
     def display_youtube_download_options(self, youtube):
         # Add all Video download options, sorted by Resolution
