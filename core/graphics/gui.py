@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 
 import core
-from core.graphics.tabs.youtube import tab
+from core.graphics.tabs.youtube import main_tab
 
 
 class App(tk.Tk):
@@ -23,7 +23,7 @@ class App(tk.Tk):
 
         # create tabs
         self.blob_tab = ttk.Frame(self.notebook)
-        self.youtube_tab = tab.YoutubeTab()
+        self.youtube_tab = main_tab.YoutubeTab()
 
         # setup notebook
         self.notebook.add(self.blob_tab, text='BLOB')

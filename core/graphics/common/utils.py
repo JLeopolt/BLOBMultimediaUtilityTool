@@ -30,3 +30,18 @@ def convert_seconds_to_duration(seconds):
             duration = "0" + duration
         return str(h) + ":" + duration
     return duration
+
+
+def format_view_count(views):
+    return format(views, ',d')
+
+
+# Destroys all children of a frame.
+def destroy_children(frame):
+    for widget in frame.winfo_children():
+        widget.destroy()
+
+
+# Removes all whitespace, tab, newline, etc. from a string and returns.
+def trim(string):
+    return string.strip(' \t\n\r')

@@ -27,7 +27,7 @@ class Console(tk.scrolledtext.ScrolledText):
 
     def setup_console_tags(self):
         self.tag_configure('error', background="yellow", foreground="red")
-        self.tag_configure('warning', background="orange", foreground="white")
+        self.tag_configure('warning', background="orange")
         self.tag_configure('success', background="green", foreground="white")
         self.tag_configure('notice', background="blue", foreground="white")
 
