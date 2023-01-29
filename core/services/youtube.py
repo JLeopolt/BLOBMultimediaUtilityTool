@@ -25,4 +25,4 @@ def download_stream(console, youtube, itag):
 
     # print a success message
     console.printSuccess('Downloaded media as \"' + filepath + "\". (" +
-                              str(round(time.time() - start_time, 2)) + "s)")
+                         str(round(time.time() - start_time, 2)) + "s)")
