@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter.ttk import OptionMenu
 
 from core.graphics.common import utils
 from core.graphics.common.progressbar import ProgressBar
@@ -9,13 +8,27 @@ from core.graphics.main.modules.stream_selector import StreamSelector
 
 # The display frame which allows the user to select a download stream, convert file types, etc.
 class ConvertFrame(ttk.LabelFrame):
-    selected_mode = None
+    # output mode
+    output_mode = None
+
+    # stream selector
     video_stream_selector = None
     audio_stream_selector = None
+
+    # file conversion
+    file_convert_type = None
+    file_type_menu = None
+    custom_file_convert_type = None
 
     # Upon construction the frame is empty and won't show up until build() is called.
     def __init__(self, container):
         super().__init__(container, text='Convert & Download')
+
+        # preset file types for videos
+        self.preset_video_filetypes = ['.mp4', '.mov', '.wmv', '.avi', '.mkv', '.webm']
+
+        # preset file types for audio
+        self.preset_audio_filetypes = ['.mp3', '.wav', '.ogg', '.flac', '.aiff']
 
     def reset(self):
         utils.destroy_children(self)
@@ -36,23 +49,34 @@ class ConvertFrame(ttk.LabelFrame):
         youtube.streams.filter(adaptive=True)
         progress_bar.stop()
 
-        # Selects which output mode to use. Changes which options show up in the converter tab when selected.
-        self.selected_mode = tk.StringVar()
-        output_mode_selector = OptionMenu(self, self.selected_mode,
-                                          'Video',
-                                          *['Video', 'Audio', 'Mute Video'],
-                                          command=self.update_output_mode)
+        # build output mode frame.
+        self.output_mode = tk.StringVar()
+        output_mode_frame = self.build_output_mode_frame()
+        output_mode_frame.pack(side='left', expand=True)
+
+        # streams are selected in this section
+        stream_select_frame = self.build_stream_select_frame(youtube)
+        stream_select_frame.pack(side='left', expand=True)
+
+        # the file conversion takes place here
+        file_convert_frame = self.build_file_convert_frame(self.preset_video_filetypes)
+        file_convert_frame.pack(side='left', expand=True)
+
+        # the final request can be submitted in this section
+        finish_frame = self.build_finish_frame()
+        finish_frame.pack(side='left', expand=True)
+
+    # Selects which output mode to use. Changes which options show up in the converter tab when selected.
+    def build_output_mode_frame(self):
+        output_mode_selector_frame = ttk.Frame(self)
+        ttk.Label(output_mode_selector_frame, text='Output Mode').pack()
+        output_mode_selector = ttk.OptionMenu(output_mode_selector_frame,
+                                              self.output_mode,
+                                              'Video',
+                                              *['Video', 'Audio', 'Mute Video'],
+                                              command=self.update_output_mode)
         output_mode_selector.pack()
-
-        # list of all video streams, in descending order of resolution
-        videos = youtube.streams.filter(adaptive=True).order_by('resolution').__reversed__()
-        self.video_stream_selector = StreamSelector(self, videos)
-        self.video_stream_selector.pack()
-
-        # list of all audio streams, in descending order of bit-rate
-        audios = youtube.streams.filter(adaptive=True, only_audio=True).order_by('abr').__reversed__()
-        self.audio_stream_selector = StreamSelector(self, audios)
-        self.audio_stream_selector.pack()
+        return output_mode_selector_frame
 
     # Updates convert elements based on the output mode selected.
     # value is the value of the output_mode optionmenu, automatically passed into the command.
@@ -69,15 +93,80 @@ class ConvertFrame(ttk.LabelFrame):
         # Only use an audio stream.
         self.video_stream_selector.configure(state='disabled')
         self.audio_stream_selector.configure(state='enabled')
+        # file output as audio
+        self.update_file_type_menu_options(self.preset_audio_filetypes)
 
     # Updates the Converter Frame to 'Video' output mode.
     def set_video_mode(self):
         # Use both a Video and Audio stream.
         self.video_stream_selector.configure(state='enabled')
         self.audio_stream_selector.configure(state='enabled')
+        # file output as video
+        self.update_file_type_menu_options(self.preset_video_filetypes)
 
     # Updates the Converter Frame to 'Mute Video' output mode.
     def set_muted_vid_mode(self):
         # Use ONLY a video stream.
         self.video_stream_selector.configure(state='enabled')
         self.audio_stream_selector.configure(state='disabled')
+        # file output as video
+        self.update_file_type_menu_options(self.preset_video_filetypes)
+
+    # streams are selected in this section
+    def build_stream_select_frame(self, youtube):
+        stream_select_frame = ttk.Frame(self)
+        ttk.Label(stream_select_frame, text='Download Streams').pack()
+
+        # list of all video streams, in descending order of resolution
+        videos = youtube.streams.filter(adaptive=True).order_by('resolution').__reversed__()
+        self.video_stream_selector = StreamSelector(stream_select_frame, videos)
+        self.video_stream_selector.pack()
+
+        # list of all audio streams, in descending order of bit-rate
+        audios = youtube.streams.filter(adaptive=True, only_audio=True).order_by('abr').__reversed__()
+        self.audio_stream_selector = StreamSelector(stream_select_frame, audios)
+        self.audio_stream_selector.pack()
+
+        return stream_select_frame
+
+    # the file conversion takes place here
+    def build_file_convert_frame(self, file_type_presets):
+        file_convert_frame = ttk.Frame(self)
+        ttk.Label(file_convert_frame, text='Output File Type').pack(side='top')
+
+        # Selector, the user can select from a preset list of possible file types.
+        self.file_convert_type = tk.StringVar(file_convert_frame)
+        self.file_type_menu = ttk.OptionMenu(file_convert_frame,
+                                             self.file_convert_type,
+                                             file_type_presets[0],
+                                             *file_type_presets,
+                                             command=self.reset_custom_type_entrybox)
+        self.file_type_menu.pack(side='left')
+
+        # entry box, the user can enter a custom file type.
+        # ttk.Label(file_convert_frame, text='Custom File Type').pack()
+        self.custom_file_convert_type = tk.StringVar(file_convert_frame)
+        ttk.Entry(file_convert_frame, textvariable=self.custom_file_convert_type, width=6).pack(side='left')
+
+        return file_convert_frame
+
+    # updates the choices in the file type option menu
+    def update_file_type_menu_options(self, file_type_presets):
+        # delete old filetypes
+        self.file_type_menu['menu'].delete(0, 'end')
+        # add all new file types
+        for filetype in file_type_presets:
+            self.file_type_menu['menu'].add_command(label=filetype, command=tk._setit(self.file_convert_type, filetype))
+        # set default value
+        self.file_convert_type.set(file_type_presets[0])
+
+    # if a preset file type is selected, reset custom file type entrybox.
+    def reset_custom_type_entrybox(self, value):
+        self.custom_file_convert_type.set('')
+        self.file_type_menu.focus()
+
+    # the final request can be submitted in this section
+    def build_finish_frame(self):
+        finish_frame = ttk.Frame(self)
+        ttk.Label(finish_frame, text='Finish').pack()
+        return finish_frame
