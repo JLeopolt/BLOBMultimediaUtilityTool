@@ -23,11 +23,13 @@ class Shortcuts(ttk.Frame):
         s = ttk.Style()
         s.configure('scut.TButton', font=12)
 
-        self.run_button = ttk.Button(self, text='\u25BA', width=2, style='scut.TButton', command=self.Run)
+        # 25BA
+        self.run_button = ttk.Button(self, text='\u25B6', width=2, style='scut.TButton', command=self.Run)
         self.run_button.pack(side='left', padx=1)
         Hovertip(self.run_button, '@Run: Execute the current process.')
 
-        self.clear_button = ttk.Button(self, text='\u2421', width=2, style='scut.TButton', command=self.Clear)
+        # \u2421
+        self.clear_button = ttk.Button(self, text='\u2326', width=2, style='scut.TButton', command=self.Clear)
         self.clear_button.pack(side='left', padx=1)
         Hovertip(self.clear_button, '@Clear: Clears output frame.')
 
@@ -50,14 +52,14 @@ class Shortcuts(ttk.Frame):
                                        command=lambda: self.Save(True))
         self.save_ask_btn.configure(state='disabled')
         self.save_ask_btn.pack(side='left', padx=1)
-        Hovertip(self.save_ask_btn, '*Save=ASK: When downloading,\nyou will be prompted for a save location.')
+        Hovertip(self.save_ask_btn, '*Save=ASK: When downloading, you \nwill be prompted for a save location.')
 
         self.save_auto_btn = ttk.Button(self, text='\u25B8F', width=2, style='scut.TButton',
                                         command=lambda: self.Save(False))
         self.save_auto_btn.pack(side='left', padx=1)
         Hovertip(self.save_auto_btn, '*Save=AUTO: When downloading,\nfiles save straight to *SaveDir.')
 
-        self.set_savedir_btn = ttk.Button(self, text='\u21B3F', width=2, style='scut.TButton',
+        self.set_savedir_btn = ttk.Button(self, text='\u21B3F', width=3, style='scut.TButton',
                                           command=lambda: files.prompt_update_default_save_directory(
                                               youtubetab.console))
         self.set_savedir_btn.pack(side='left', padx=1)
@@ -77,7 +79,7 @@ class Shortcuts(ttk.Frame):
         self.youtube_tab.schedule_youtube_video_access()
 
     def Clear(self):
-        self.youtube_tab.reset_output_frame()
+        self.youtube_tab.Clear()
 
     # Updates the Save Mode between ASK and AUTO, disabling the selected button.
     def Save(self, ask):

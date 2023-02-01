@@ -42,6 +42,12 @@ def destroy_children(frame):
         widget.destroy()
 
 
+# Performs pack_forget for all children of a frame.
+def pack_forget_children(frame):
+    for widget in frame.winfo_children():
+        widget.pack_forget()
+
+
 # Removes all whitespace, tab, newline, etc. from a string and returns.
 def trim(string):
     return string.strip(' \t\n\r')

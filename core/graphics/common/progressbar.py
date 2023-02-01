@@ -3,7 +3,6 @@ from core.graphics.common import utils
 
 
 class ProgressBar(ttk.Frame):
-
     progress_bar = None
 
     def __init__(self, container):
