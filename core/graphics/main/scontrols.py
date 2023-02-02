@@ -13,6 +13,8 @@ def enable(button):
 
 # A frame which contains a panel of Buttons with various 'Shortcut' functions.
 class Shortcuts(ttk.Frame):
+    # URL Mode defaults to YouTube
+    URL_Mode = 0
 
     def __init__(self, youtubetab, container):
         super().__init__(container)
@@ -48,6 +50,29 @@ class Shortcuts(ttk.Frame):
         # Separator
         ttk.Separator(self, orient='vertical').pack(side='left', padx=8, fill='y')
 
+        # Set URL MODE to YouTube
+        self.youtube_button = ttk.Button(self, text='\u25B6\u2261', width=2, style='scut.TButton',
+                                         command=lambda: self.set_URL_mode(0))
+        self.youtube_button.pack(side='left', padx=1)
+        Hovertip(self.youtube_button, '*Mode=YouTube: Treat the input as a YouTube URL.')
+        # selected by default
+        disable(self.youtube_button)
+
+        # Set URL MODE to BLOB direct
+        self.blob_button = ttk.Button(self, text='B\u2261', width=2, style='scut.TButton',
+                                      command=lambda: self.set_URL_mode(1))
+        self.blob_button.pack(side='left', padx=1)
+        Hovertip(self.blob_button, '*Mode=BLOB: Treat the input as a BLOB URL.')
+
+        # Set URL MODE to Auto
+        self.scan_button = ttk.Button(self, text='?\u2261', width=2, style='scut.TButton',
+                                      command=lambda: self.set_URL_mode(2))
+        self.scan_button.pack(side='left', padx=1)
+        Hovertip(self.scan_button, '*Mode=Scan: Scan the input, looking for media files or BLOB URLs.')
+
+        # Separator
+        ttk.Separator(self, orient='vertical').pack(side='left', padx=8, fill='y')
+
         self.save_ask_btn = ttk.Button(self, text='?F', width=2, style='scut.TButton',
                                        command=lambda: self.Save(True))
         self.save_ask_btn.configure(state='disabled')
@@ -64,6 +89,23 @@ class Shortcuts(ttk.Frame):
                                               youtubetab.console))
         self.set_savedir_btn.pack(side='left', padx=1)
         Hovertip(self.set_savedir_btn, '*SaveDir: Select a location to\nautomatically save to.')
+
+    def set_URL_mode(self, mode):
+        # youtube mode
+        if mode == 0:
+            disable(self.youtube_button)
+            enable(self.blob_button)
+            enable(self.scan_button)
+        # Blob mode
+        elif mode == 1:
+            disable(self.blob_button)
+            enable(self.youtube_button)
+            enable(self.scan_button)
+        # Scan mode
+        elif mode == 2:
+            disable(self.scan_button)
+            enable(self.youtube_button)
+            enable(self.blob_button)
 
     # executed when a new process is scheduled.
     # disables some shortcuts.

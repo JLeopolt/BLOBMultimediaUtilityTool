@@ -60,7 +60,7 @@ class MainFrame(ttk.Frame):
         self.short_cuts.pack(side='top', fill='x')
 
         # Label for input field
-        url_label = ttk.Label(input_frame, text='YouTube URL:')
+        url_label = ttk.Label(input_frame, text='URL:')
         url_label.pack(side='left', padx=3)
 
         # url entry field
@@ -69,7 +69,7 @@ class MainFrame(ttk.Frame):
 
         # load button
         load_button = ttk.Button(input_frame, text='Load', width=6, command=self.schedule_youtube_video_access)
-        Hovertip(load_button, 'Load the YouTube video from URL.')
+        Hovertip(load_button, 'Load source streams from URL.')
         load_button.pack(side='left', padx=3)
 
         return input_frame

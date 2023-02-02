@@ -20,7 +20,7 @@ class App(tk.Tk):
 
         # create main frame
         self.youtube_tab = main_frame.MainFrame(self)
-        self.youtube_tab.pack()
+        self.youtube_tab.pack(expand=True, fill='both')
 
         # menubar config
         self.configure_menubar()
