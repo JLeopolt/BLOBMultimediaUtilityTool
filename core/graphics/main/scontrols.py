@@ -40,11 +40,11 @@ class Shortcuts(ttk.Frame):
 
         self.audio_hr_button = ttk.Button(self, text='\u266B', width=2, style='scut.TButton')
         self.audio_hr_button.pack(side='left', padx=1)
-        Hovertip(self.audio_hr_button, '@Audio.M: @Run \u27A1 Automatically download\naudio at highest resolution.')
+        Hovertip(self.audio_hr_button, '@Audio: @Run \u27A1 Automatically download\naudio at highest resolution.')
 
         self.video_hr_button = ttk.Button(self, text='\u2B73', width=2, style='scut.TButton')
         self.video_hr_button.pack(side='left', padx=1)
-        Hovertip(self.video_hr_button, '@Video.M: @Run \u27A1 Automatically download\nvideo & audio at highest '
+        Hovertip(self.video_hr_button, '@Video: @Run \u27A1 Automatically download\nvideo & audio at highest '
                                        'resolution.')
 
         # Separator
@@ -68,7 +68,7 @@ class Shortcuts(ttk.Frame):
         self.scan_button = ttk.Button(self, text='?\u2261', width=2, style='scut.TButton',
                                       command=lambda: self.set_URL_mode(2))
         self.scan_button.pack(side='left', padx=1)
-        Hovertip(self.scan_button, '*Mode=Scan: Scan the input, looking for media files or BLOB URLs.')
+        Hovertip(self.scan_button, '*Mode=Scan: Scan the input, looking for\nmedia files or BLOB URLs.')
 
         # Separator
         ttk.Separator(self, orient='vertical').pack(side='left', padx=8, fill='y')
@@ -77,12 +77,12 @@ class Shortcuts(ttk.Frame):
                                        command=lambda: self.Save(True))
         self.save_ask_btn.configure(state='disabled')
         self.save_ask_btn.pack(side='left', padx=1)
-        Hovertip(self.save_ask_btn, '*Save=ASK: When downloading, you \nwill be prompted for a save location.')
+        Hovertip(self.save_ask_btn, '*Save=Ask: When downloading, you \nwill be prompted for a save location.')
 
         self.save_auto_btn = ttk.Button(self, text='\u25B8F', width=2, style='scut.TButton',
                                         command=lambda: self.Save(False))
         self.save_auto_btn.pack(side='left', padx=1)
-        Hovertip(self.save_auto_btn, '*Save=AUTO: When downloading,\nfiles save straight to *SaveDir.')
+        Hovertip(self.save_auto_btn, '*Save=Auto: When downloading,\nfiles save straight to *SaveDir.')
 
         self.set_savedir_btn = ttk.Button(self, text='\u21B3F', width=3, style='scut.TButton',
                                           command=lambda: files.prompt_update_default_save_directory(

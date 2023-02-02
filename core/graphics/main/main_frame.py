@@ -35,7 +35,7 @@ class MainFrame(ttk.Frame):
         self.youtube_metadata_frame.pack(side='top', fill='x', anchor='n')
 
         # houses download streams, conversion options
-        self.convert_frame = convert_frame.ConvertFrame(self)
+        self.convert_frame = convert_frame.ConvertFrame(self, self.console)
         self.convert_frame.pack(side='top', fill='x', anchor='n')
 
         # pack the console at the bottom
