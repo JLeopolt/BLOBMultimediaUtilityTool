@@ -1,5 +1,7 @@
+import os
 import tkinter as tk
 import time
+import uuid
 from tkinter import ttk
 
 import ffmpeg
@@ -190,6 +192,7 @@ class ConvertFrame(ttk.LabelFrame):
 
     # called when the user finishes their conversion request.
     def download(self):
+
         # get the save location. May prompt the user.
         save_dir = files.get_save_location()
 
@@ -199,70 +202,98 @@ class ConvertFrame(ttk.LabelFrame):
                                     'prompted.')
             return
 
+        self.console.printInfo("Starting media download..")
+
         mode = self.output_mode.get()
+        output_filename = self.get_output_filename()
+        output_filepath = save_dir + "/" + output_filename
+        # account for root dirs
+        if save_dir[-1] == "/":
+            output_filepath = save_dir + output_filename
 
         # download depending on output mode.
         if mode == 'Video':
-            # download the video and audio streams, plug the temporary locations into ffmpeg.
-            src_vid = ffmpeg.input(self.temp_download_stream(save_dir, self.video_stream_selector.get_selected_itag()))
-            src_aud = ffmpeg.input(self.temp_download_stream(save_dir, self.audio_stream_selector.get_selected_itag()))
+            # get video and audio streams ready
+            video_stream = self.youtube.streams.get_by_itag(self.video_stream_selector.get_selected_itag())
+            audio_stream = self.youtube.streams.get_by_itag(self.audio_stream_selector.get_selected_itag())
+
+            # temp download the streams
+            src_vid = ffmpeg.input(self.temp_download_stream(save_dir, video_stream))
+            src_aud = ffmpeg.input(self.temp_download_stream(save_dir, audio_stream))
 
             start_time = time.time()
-            output_filename = self.get_output_filename()
             self.console.printInfo('Converting file and downloading as \"' + output_filename + "\".")
 
-            # perform the concatenation and download
-            ffmpeg.concat(src_vid, src_aud, v=1, a=1).output(save_dir + output_filename).run()
+            # perform the concatenation
+            operation = ffmpeg.concat(src_vid, src_aud, v=1, a=1)
+            # get audio and video codecs
+            operation = operation.output(output_filepath)
+            operation.run(overwrite_output=True)
+
+            # delete temp files leftover
+            self.cleanup_temp_files()
 
             # print confirmation message
-            self.console.printInfo('Video file has been saved to \"' + save_dir + output_filename + "\". (" +
-                                   str(round(time.time() - start_time, 2)) + "s)")
+            self.console.printSuccess('Video file has been saved to \"' + output_filepath + "\". (" +
+                                      str(round(time.time() - start_time, 2)) + "s)")
 
         elif mode == 'Audio':
             # download the audio stream, plug the temporary location into ffmpeg.
             src_aud = ffmpeg.input(self.temp_download_stream(save_dir, self.audio_stream_selector.get_selected_itag()))
 
             start_time = time.time()
-            output_filename = self.get_output_filename()
             self.console.printInfo('Converting file and downloading as \"' + output_filename + "\".")
 
             # perform the conversion and download
-            ffmpeg.output(src_aud, save_dir + output_filename).run()
+            operation = ffmpeg.output(src_aud, output_filepath)
+            operation.run(overwrite_output=True)
+
+            # delete temp files leftover
+            self.cleanup_temp_files()
 
             # print confirmation message
-            self.console.printInfo('Audio file has been saved to \"' + save_dir + output_filename + "\". (" +
-                                   str(round(time.time() - start_time, 2)) + "s)")
+            self.console.printSuccess('Audio file has been saved to \"' + output_filepath + "\". (" +
+                                      str(round(time.time() - start_time, 2)) + "s)")
 
         elif mode == 'Mute Video':
             # download the video stream, plug the temporary location into ffmpeg.
             src_vid = ffmpeg.input(self.temp_download_stream(save_dir, self.video_stream_selector.get_selected_itag()))
 
             start_time = time.time()
-            output_filename = self.get_output_filename()
             self.console.printInfo('Converting file and downloading as \"' + output_filename + "\".")
 
             # perform the conversion and download
-            ffmpeg.output(src_vid, save_dir + output_filename).run()
+            operation = ffmpeg.output(src_vid, output_filepath)
+            operation.run(overwrite_output=True)
+
+            # delete temp files leftover
+            self.cleanup_temp_files()
 
             # print confirmation message
-            self.console.printInfo('Mute video file has been saved to \"' + save_dir + output_filename + "\". (" +
-                                   str(round(time.time() - start_time, 2)) + "s)")
+            self.console.printSuccess('Mute video file has been saved to \"' + output_filepath +
+                                      "\". (" + str(round(time.time() - start_time, 2)) + "s)")
 
     # downloads a stream temporarily, returns the filepath.
     # assumes save location is valid
     # note: this is NOT a temp file!
-    def temp_download_stream(self, loc, itag):
+    def temp_download_stream(self, loc, stream):
         # Download the file
-        start_time = time.time()
-        filepath = self.youtube.streams.get_by_itag(itag).download(output_path=loc)
+        # start_time = time.time()
+        filepath = stream.download(output_path=loc, filename=str(uuid.uuid4()))
 
         # print a success message
-        self.console.printInfo('Downloaded temporary media stream as \"' + filepath + "\". (" +
-                               str(round(time.time() - start_time, 2)) + "s)")
+        # self.console.printInfo("Downloaded temporary media stream with itag=" + str(itag) +
+        #                        "(" + str(round(time.time() - start_time, 2)) + "s)")
 
         # add to cache, and return
         self.cached_temp_files.append(filepath)
         return filepath
+
+    # removes all cached temp files from the system.
+    def cleanup_temp_files(self):
+        for filepath in self.cached_temp_files:
+            os.remove(filepath)
+        self.cached_temp_files = []
 
     # returns the filename in form: <youtube title>.<extension>
     def get_output_filename(self):
