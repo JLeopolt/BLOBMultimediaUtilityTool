@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from PIL import Image, ImageTk
 
 import core
 from core.graphics.main import main_frame
@@ -17,6 +18,10 @@ class App(tk.Tk):
         self.title('BLOB Multimedia Utility Tool v' + core.__version__)
         self.geometry('600x700')
         self.style = ttk.Style(self)
+
+        # create window icon
+        ico = tk.PhotoImage(file="core/assets/icon.png")
+        self.wm_iconphoto(False, ico)
 
         # create main frame
         self.youtube_tab = main_frame.MainFrame(self)
