@@ -2,9 +2,10 @@ import tkinter as tk
 import urllib
 from tkinter import ttk
 from urllib import request
+
 from PIL import Image, ImageTk
+
 from core.graphics.common import utils
-from core.services import files
 
 
 class MetadataFrame(ttk.LabelFrame):

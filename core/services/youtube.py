@@ -36,10 +36,8 @@ def download(convert_frame, youtube):
     # download depending on output mode.
     if mode == 'Video':
         # get video and audio streams ready
-        video_stream = youtube.streams.get_by_itag(
-            convert_frame.video_stream_selector.get_selected_itag())
-        audio_stream = youtube.streams.get_by_itag(
-            convert_frame.audio_stream_selector.get_selected_itag())
+        video_stream = youtube.streams.get_by_itag(convert_frame.video_stream_selector.get_selected_itag())
+        audio_stream = youtube.streams.get_by_itag(convert_frame.audio_stream_selector.get_selected_itag())
 
         # temp download the streams
         src_vid = ffmpeg.input(temp_download_stream(save_dir, video_stream))
@@ -63,8 +61,8 @@ def download(convert_frame, youtube):
 
     elif mode == 'Audio':
         # download the audio stream, plug the temporary location into ffmpeg.
-        src_aud = ffmpeg.input(
-            temp_download_stream(save_dir, convert_frame.audio_stream_selector.get_selected_itag()))
+        audio_stream = youtube.streams.get_by_itag(convert_frame.audio_stream_selector.get_selected_itag())
+        src_aud = ffmpeg.input(temp_download_stream(save_dir, audio_stream))
 
         start_time = time.time()
         convert_frame.console.printInfo('Converting file and downloading as \"' + output_filename + "\".")
@@ -82,8 +80,8 @@ def download(convert_frame, youtube):
 
     elif mode == 'Mute Video':
         # download the video stream, plug the temporary location into ffmpeg.
-        src_vid = ffmpeg.input(
-            temp_download_stream(save_dir, convert_frame.video_stream_selector.get_selected_itag()))
+        video_stream = youtube.streams.get_by_itag(convert_frame.video_stream_selector.get_selected_itag())
+        src_vid = ffmpeg.input(temp_download_stream(save_dir, video_stream))
 
         start_time = time.time()
         convert_frame.console.printInfo('Converting file and downloading as \"' + output_filename + "\".")

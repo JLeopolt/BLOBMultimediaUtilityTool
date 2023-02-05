@@ -92,8 +92,11 @@ class MainFrame(ttk.Frame):
             # BLOB mode will treat the URL as a direct BLOB link.
             self.worker_thread = Thread(target=loader.load_BLOB, args=[self])
         elif URL_MODE == 2:
-            # TODO: Scan mode
+            # Files mode will treat the URL as a direct file URL.
             self.worker_thread = Thread(target=loader.load_file_URL, args=[self])
+        elif URL_MODE == 3:
+            # TODO: Scan mode
+            x = 0
 
         # start the process on the worker thread.
         self.worker_thread.start()

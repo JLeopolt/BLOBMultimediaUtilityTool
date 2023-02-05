@@ -3,13 +3,12 @@ from pytube.exceptions import RegexMatchError
 import core
 import core.services.youtube
 import core.graphics.common.utils as utils
+import requests
+from core.services import files
 
 
 # takes in the main frame. loads in the youtube video from link provided
 # should be called asynchronously.
-from core.services import files
-
-
 def load_youtube_video(main):
     # Get the YouTube link from user input
     youtube_link = main.link_entry_field.get()
@@ -66,6 +65,15 @@ def load_file_URL(main):
     file_URL = main.link_entry_field.get()
     if utils.trim(file_URL) == '':
         main.console.printError("No URL was provided.")
+        return
+
+    # check if the URL is valid.
+    try:
+        head = requests.head(file_URL)
+        if head.status_code != requests.codes.ok:
+            raise Exception
+    except (Exception,):
+        main.console.printError("Input is not a valid URL.")
         return
 
     main.short_cuts.block_new_processes()

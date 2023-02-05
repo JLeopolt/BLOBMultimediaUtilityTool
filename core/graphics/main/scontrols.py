@@ -64,9 +64,15 @@ class Shortcuts(ttk.Frame):
         self.blob_button.pack(side='left', padx=1)
         Hovertip(self.blob_button, '*Mode=BLOB: Treat the input as a BLOB URL.')
 
+        # Set URL MODE to BLOB direct
+        self.files_button = ttk.Button(self, text='F\u2261', width=2, style='scut.TButton',
+                                       command=lambda: self.set_URL_mode(2))
+        self.files_button.pack(side='left', padx=1)
+        Hovertip(self.files_button, '*Mode=FILE: Treat the input as a file URL.')
+
         # Set URL MODE to Auto
         self.scan_button = ttk.Button(self, text='?\u2261', width=2, style='scut.TButton',
-                                      command=lambda: self.set_URL_mode(2))
+                                      command=lambda: self.set_URL_mode(3))
         self.scan_button.pack(side='left', padx=1)
         Hovertip(self.scan_button, '*Mode=Scan: Scan the input, looking for\nmedia files or BLOB URLs.')
 
@@ -98,16 +104,25 @@ class Shortcuts(ttk.Frame):
             disable(self.youtube_button)
             enable(self.blob_button)
             enable(self.scan_button)
+            enable(self.files_button)
         # Blob mode
         elif mode == 1:
             disable(self.blob_button)
             enable(self.youtube_button)
             enable(self.scan_button)
-        # Scan mode
+            enable(self.files_button)
+        # File mode
         elif mode == 2:
+            disable(self.files_button)
+            enable(self.youtube_button)
+            enable(self.scan_button)
+            enable(self.blob_button)
+        # Scan mode
+        elif mode == 3:
             disable(self.scan_button)
             enable(self.youtube_button)
             enable(self.blob_button)
+            enable(self.files_button)
 
     # executed when a new process is scheduled.
     # disables some shortcuts.
