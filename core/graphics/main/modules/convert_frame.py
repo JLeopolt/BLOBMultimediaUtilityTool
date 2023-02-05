@@ -1,47 +1,31 @@
-import os
 import tkinter as tk
-import time
-import uuid
 from tkinter import ttk
-
-import ffmpeg
 
 from core.graphics.common import utils
 from core.graphics.common.progressbar import ProgressBar
 from core.graphics.main.modules.stream_selector import StreamSelector
+from core.services import youtube as yt, direct_file as dir_f
+
 
 # The display frame which allows the user to select a download stream, convert file types, etc.
-from core.services import files
-
-
 class ConvertFrame(ttk.LabelFrame):
-    # current youtube object
-    youtube = None
-
+    enable_stream_select = None
     # output mode
     output_mode = None
-
     # stream selector
     video_stream_selector = None
     audio_stream_selector = None
-
     # file conversion
     file_convert_type = None
     file_type_menu = None
     custom_file_convert_type = None
 
-    # filepaths of any streams saved temporarily
-    cached_temp_files = []
-
     # Upon construction the frame is empty and won't show up until build() is called.
     def __init__(self, container, console):
         super().__init__(container, text='Convert & Download')
-
         self.console = console
-
         # preset file types for videos
         self.preset_video_filetypes = ['.mp4', '.mov', '.wmv', '.avi', '.mkv', '.webm']
-
         # preset file types for audio
         self.preset_audio_filetypes = ['.mp3', '.wav', '.ogg', '.flac', '.aiff']
 
@@ -50,11 +34,10 @@ class ConvertFrame(ttk.LabelFrame):
         ttk.Frame(self, width=0, height=0, borderwidth=0).pack()
 
     # resets the frame and builds it again.
-    def build(self, youtube):
+    def build_from_youtube(self, youtube):
         # reset frame
         self.reset()
-
-        self.youtube = youtube
+        self.enable_stream_select = True
 
         # create and start the progress bar now.
         progress_bar = ProgressBar(self)
@@ -80,7 +63,32 @@ class ConvertFrame(ttk.LabelFrame):
         file_convert_frame.pack(side='left', expand=True)
 
         # the final request can be submitted in this section
-        finish_frame = self.build_finish_frame()
+        finish_frame = self.build_finish_frame(yt.download, youtube)
+        finish_frame.pack(side='left', expand=True)
+
+    # expects a FileURLMetadata object
+    def build_from_file(self, url_meta):
+        # reset frame
+        self.reset()
+        self.enable_stream_select = False
+
+        # build output mode frame.
+        self.output_mode = tk.StringVar()
+        output_mode_frame = self.build_output_mode_frame()
+        output_mode_frame.pack(side='left', expand=True)
+
+        # download source is shown in this section
+        source_select_frame = ttk.Frame(self)
+        ttk.Label(source_select_frame, text='Download Streams').pack()
+        ttk.Label(source_select_frame, text='File: '+url_meta.filename).pack()
+        source_select_frame.pack(side='left', expand=True)
+
+        # the file conversion takes place here
+        file_convert_frame = self.build_file_convert_frame(self.preset_video_filetypes)
+        file_convert_frame.pack(side='left', expand=True)
+
+        # the final request can be submitted in this section
+        finish_frame = self.build_finish_frame(dir_f.download, url_meta)
         finish_frame.pack(side='left', expand=True)
 
     # Selects which output mode to use. Changes which options show up in the converter tab when selected.
@@ -108,24 +116,27 @@ class ConvertFrame(ttk.LabelFrame):
     # Updates the Converter Frame to 'Audio' output mode.
     def set_audio_mode(self):
         # Only use an audio stream.
-        self.video_stream_selector.configure(state='disabled')
-        self.audio_stream_selector.configure(state='enabled')
+        if self.enable_stream_select:
+            self.video_stream_selector.configure(state='disabled')
+            self.audio_stream_selector.configure(state='enabled')
         # file output as audio
         self.update_file_type_menu_options(self.preset_audio_filetypes)
 
     # Updates the Converter Frame to 'Video' output mode.
     def set_video_mode(self):
         # Use both a Video and Audio stream.
-        self.video_stream_selector.configure(state='enabled')
-        self.audio_stream_selector.configure(state='enabled')
+        if self.enable_stream_select:
+            self.video_stream_selector.configure(state='enabled')
+            self.audio_stream_selector.configure(state='enabled')
         # file output as video
         self.update_file_type_menu_options(self.preset_video_filetypes)
 
     # Updates the Converter Frame to 'Mute Video' output mode.
     def set_muted_vid_mode(self):
         # Use ONLY a video stream.
-        self.video_stream_selector.configure(state='enabled')
-        self.audio_stream_selector.configure(state='disabled')
+        if self.enable_stream_select:
+            self.video_stream_selector.configure(state='enabled')
+            self.audio_stream_selector.configure(state='disabled')
         # file output as video
         self.update_file_type_menu_options(self.preset_video_filetypes)
 
@@ -183,124 +194,17 @@ class ConvertFrame(ttk.LabelFrame):
         self.file_type_menu.focus()
 
     # the final request can be submitted in this section
-    def build_finish_frame(self):
+    def build_finish_frame(self, funct, data):
         finish_frame = ttk.Frame(self)
         ttk.Label(finish_frame, text='Finish').pack()
 
-        ttk.Button(finish_frame, text='Download', command=self.download).pack()
+        ttk.Button(finish_frame, text='Download', command=lambda: funct(self, data),).pack()
         return finish_frame
 
-    # called when the user finishes their conversion request.
-    def download(self):
-
-        # get the save location. May prompt the user.
-        save_dir = files.get_save_location()
-
-        # if failed to get a save location
-        if save_dir is None:
-            self.console.printError('*SaveDir not specified. Either enable *Save=Auto, or select a save location when '
-                                    'prompted.')
-            return
-
-        self.console.printInfo("Starting media download..")
-
-        mode = self.output_mode.get()
-        output_filename = self.get_output_filename()
-        output_filepath = save_dir + "/" + output_filename
-        # account for root dirs
-        if save_dir[-1] == "/":
-            output_filepath = save_dir + output_filename
-
-        # download depending on output mode.
-        if mode == 'Video':
-            # get video and audio streams ready
-            video_stream = self.youtube.streams.get_by_itag(self.video_stream_selector.get_selected_itag())
-            audio_stream = self.youtube.streams.get_by_itag(self.audio_stream_selector.get_selected_itag())
-
-            # temp download the streams
-            src_vid = ffmpeg.input(self.temp_download_stream(save_dir, video_stream))
-            src_aud = ffmpeg.input(self.temp_download_stream(save_dir, audio_stream))
-
-            start_time = time.time()
-            self.console.printInfo('Converting file and downloading as \"' + output_filename + "\".")
-
-            # perform the concatenation
-            operation = ffmpeg.concat(src_vid, src_aud, v=1, a=1)
-            # get audio and video codecs
-            operation = operation.output(output_filepath)
-            operation.run(overwrite_output=True)
-
-            # delete temp files leftover
-            self.cleanup_temp_files()
-
-            # print confirmation message
-            self.console.printSuccess('Video file has been saved to \"' + output_filepath + "\". (" +
-                                      str(round(time.time() - start_time, 2)) + "s)")
-
-        elif mode == 'Audio':
-            # download the audio stream, plug the temporary location into ffmpeg.
-            src_aud = ffmpeg.input(self.temp_download_stream(save_dir, self.audio_stream_selector.get_selected_itag()))
-
-            start_time = time.time()
-            self.console.printInfo('Converting file and downloading as \"' + output_filename + "\".")
-
-            # perform the conversion and download
-            operation = ffmpeg.output(src_aud, output_filepath)
-            operation.run(overwrite_output=True)
-
-            # delete temp files leftover
-            self.cleanup_temp_files()
-
-            # print confirmation message
-            self.console.printSuccess('Audio file has been saved to \"' + output_filepath + "\". (" +
-                                      str(round(time.time() - start_time, 2)) + "s)")
-
-        elif mode == 'Mute Video':
-            # download the video stream, plug the temporary location into ffmpeg.
-            src_vid = ffmpeg.input(self.temp_download_stream(save_dir, self.video_stream_selector.get_selected_itag()))
-
-            start_time = time.time()
-            self.console.printInfo('Converting file and downloading as \"' + output_filename + "\".")
-
-            # perform the conversion and download
-            operation = ffmpeg.output(src_vid, output_filepath)
-            operation.run(overwrite_output=True)
-
-            # delete temp files leftover
-            self.cleanup_temp_files()
-
-            # print confirmation message
-            self.console.printSuccess('Mute video file has been saved to \"' + output_filepath +
-                                      "\". (" + str(round(time.time() - start_time, 2)) + "s)")
-
-    # downloads a stream temporarily, returns the filepath.
-    # assumes save location is valid
-    # note: this is NOT a temp file!
-    def temp_download_stream(self, loc, stream):
-        # Download the file
-        # start_time = time.time()
-        filepath = stream.download(output_path=loc, filename=str(uuid.uuid4()))
-
-        # print a success message
-        # self.console.printInfo("Downloaded temporary media stream with itag=" + str(itag) +
-        #                        "(" + str(round(time.time() - start_time, 2)) + "s)")
-
-        # add to cache, and return
-        self.cached_temp_files.append(filepath)
-        return filepath
-
-    # removes all cached temp files from the system.
-    def cleanup_temp_files(self):
-        for filepath in self.cached_temp_files:
-            os.remove(filepath)
-        self.cached_temp_files = []
-
-    # returns the filename in form: <youtube title>.<extension>
-    def get_output_filename(self):
-        build = self.youtube.title
-
+    # returns the filename in form: <filename>.<extension>
+    def get_output_filename(self, filename):
         # if there is no custom file type, use the selected preset
         if utils.trim(self.custom_file_convert_type.get()) is None or '':
-            return build + self.custom_file_convert_type.get()
+            return filename + self.custom_file_convert_type.get()
 
-        return build + self.file_convert_type.get()
+        return filename + self.file_convert_type.get()

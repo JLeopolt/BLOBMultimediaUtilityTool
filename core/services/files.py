@@ -1,5 +1,7 @@
+import os
+import socket
+from urllib.parse import urlparse
 from tkinter import filedialog
-
 from core.graphics.common import utils
 
 default_save_directory = "/"
@@ -36,3 +38,16 @@ def get_save_location():
         return loc
     # If auto download enabled, just download to the configured default dir.
     return default_save_directory
+
+
+# Contains metadata about a file url.
+class FileURLMetadata:
+
+    def __init__(self, file_URL):
+        super().__init__()
+        self.url = file_URL
+        parsed = urlparse(file_URL)
+        self.filename = os.path.basename(parsed.path)
+        self.domain = parsed.netloc
+        self.host_addr = str(socket.gethostbyname_ex(parsed.netloc)[2])
+

@@ -91,6 +91,8 @@ class Shortcuts(ttk.Frame):
         Hovertip(self.set_savedir_btn, '*SaveDir: Select a location to\nautomatically save to.')
 
     def set_URL_mode(self, mode):
+        self.URL_Mode = mode
+
         # youtube mode
         if mode == 0:
             disable(self.youtube_button)
@@ -118,7 +120,7 @@ class Shortcuts(ttk.Frame):
         enable(self.clear_button)
 
     def Run(self):
-        self.youtube_tab.schedule_youtube_video_access()
+        self.youtube_tab.schedule_load_media()
 
     def Clear(self):
         self.youtube_tab.Clear()

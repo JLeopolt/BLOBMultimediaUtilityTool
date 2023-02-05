@@ -1,12 +1,10 @@
-import time
 from idlelib.tooltip import Hovertip
 from threading import Thread
 from tkinter import ttk
-from pytube.exceptions import RegexMatchError
-import core.services.youtube
+from core.services import loader
 from core.graphics.common import console as cs, utils
 from core.graphics.main import scontrols as shortcuts
-from core.graphics.main.modules import convert_frame, metadata_frame
+from core.graphics.main.modules import convert_frame, metadata_frame as metadata
 
 
 # noinspection PyAttributeOutsideInit
@@ -18,7 +16,7 @@ class MainFrame(ttk.Frame):
         # must be initialized on startup
         self.worker_thread = None
 
-        # Prepare the console before packing it console
+        # Prepare the console before packing it
         self.console_frame = ttk.LabelFrame(self, text='Console')
         self.console = cs.Console(self.console_frame)
         self.console.pack(side='bottom', expand=True, fill='both')
@@ -31,8 +29,8 @@ class MainFrame(ttk.Frame):
         input_frame.pack(side='top', fill='x', anchor='n')
 
         # Houses youtube video metadata
-        self.youtube_metadata_frame = metadata_frame.MetadataFrame(self)
-        self.youtube_metadata_frame.pack(side='top', fill='x', anchor='n')
+        self.metadata_frame = metadata.MetadataFrame(self)
+        self.metadata_frame.pack(side='top', fill='x', anchor='n')
 
         # houses download streams, conversion options
         self.convert_frame = convert_frame.ConvertFrame(self, self.console)
@@ -44,7 +42,7 @@ class MainFrame(ttk.Frame):
     # hides all video metadata, convert tab, etc. Console and settings remain unchanged.
     def Clear(self):
         # perform graceful reset for certain frames
-        self.youtube_metadata_frame.reset()
+        self.metadata_frame.reset()
         self.convert_frame.reset()
 
         # repack everything
@@ -68,61 +66,34 @@ class MainFrame(ttk.Frame):
         self.link_entry_field.pack(side='left', padx=3, expand=True, fill='x')
 
         # load button
-        load_button = ttk.Button(input_frame, text='Load', width=6, command=self.schedule_youtube_video_access)
+        load_button = ttk.Button(input_frame, text='Load', width=6, command=self.schedule_load_media)
         Hovertip(load_button, 'Load source streams from URL.')
         load_button.pack(side='left', padx=3)
 
         return input_frame
 
-    # Schedules to async load the YouTube streams.
-    def schedule_youtube_video_access(self):
+    # Schedules to asynchronously load a media, using the task param as the function
+    # automatically determines which URL Mode to use.
+    def schedule_load_media(self):
         # cancel if a process is alr occurring.
         if self.worker_thread is not None and self.worker_thread.is_alive():
             self.console.printError('Please wait for the current process to finish before scheduling a new process.')
             return
 
-        # if free to start a new process, do so on a worker thread.
-        self.worker_thread = Thread(target=self.load_youtube_video)
+        # determine which function to call
+        self.worker_thread = None
+
+        # Determine which URL Mode to use.
+        URL_MODE = self.short_cuts.URL_Mode
+        if URL_MODE == 0:
+            # Youtube mode will treat the URL as a YouTube video
+            self.worker_thread = Thread(target=loader.load_youtube_video, args=[self])
+        elif URL_MODE == 1:
+            # BLOB mode will treat the URL as a direct BLOB link.
+            self.worker_thread = Thread(target=loader.load_BLOB, args=[self])
+        elif URL_MODE == 2:
+            # TODO: Scan mode
+            self.worker_thread = Thread(target=loader.load_file_URL, args=[self])
+
+        # start the process on the worker thread.
         self.worker_thread.start()
-
-    def load_youtube_video(self):
-        # Get the YouTube link from user input
-        youtube_link = self.link_entry_field.get()
-        if utils.trim(youtube_link) == '':
-            self.console.printError("No link was provided.")
-            return
-
-        self.short_cuts.block_new_processes()
-
-        # Start the progress bar
-        start_time = time.time()
-
-        # Get the metadata here.
-        try:
-            youtube = core.services.youtube.get_YouTube_object(youtube_link)
-        except RegexMatchError:
-            self.console.printError("Input is not a valid URL.")
-            self.short_cuts.unblock_new_processes()
-            return
-        except (Exception,) as e:
-            self.console.printError(str(e))
-            self.short_cuts.unblock_new_processes()
-            return
-
-        # resets, then builds the metadata frame
-        self.youtube_metadata_frame.build(youtube)
-
-        mid_time = time.time()
-        self.console.printInfo("Accessed video metadata. (" + str(round(mid_time - start_time, 2)) + "s)")
-        self.console.printInfo("Retrieving download streams..")
-
-        # Access the download streams here.
-        # Readies the Converter frame.
-        self.convert_frame.build(youtube=youtube)
-
-        # Success message to notify the user
-        self.console.printSuccess("Retrieved all available download streams for \"" + youtube.title + "\" ("
-                                  + str(round(time.time() - mid_time, 2)) + "s).")
-
-        # Unblock shortcuts
-        self.short_cuts.unblock_new_processes()

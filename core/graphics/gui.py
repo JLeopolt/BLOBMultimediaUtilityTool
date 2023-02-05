@@ -20,7 +20,7 @@ class App(tk.Tk):
         self.style = ttk.Style(self)
 
         # create window icon
-        ico = tk.PhotoImage(file="core/assets/icon.png")
+        ico = tk.PhotoImage(file="core/assets/icon_alt.png")
         self.wm_iconphoto(False, ico)
 
         # create main frame
