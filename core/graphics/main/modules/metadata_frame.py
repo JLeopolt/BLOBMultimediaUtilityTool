@@ -62,7 +62,7 @@ class MetadataFrame(ttk.LabelFrame):
 
         return thumbnail
 
-    def build_from_file(self, url_meta):
+    def build_from_url(self, url_meta):
         self.reset()
 
         # The thumbnail image

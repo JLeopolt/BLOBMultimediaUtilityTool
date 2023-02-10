@@ -1,6 +1,6 @@
+import os
 import tkinter as tk
 from tkinter import ttk
-from PIL import Image, ImageTk
 
 import core
 from core.graphics.main import main_frame
@@ -15,12 +15,12 @@ class App(tk.Tk):
         super().__init__()
 
         # root window
-        self.title('BLOB Multimedia Utility Tool v' + core.__version__)
+        self.title('Multimedia Utility Download Tool v' + core.__version__)
         self.geometry('600x700')
         self.style = ttk.Style(self)
 
         # create window icon
-        ico = tk.PhotoImage(file="core/assets/icon_alt.png")
+        ico = tk.PhotoImage(file="assets/icon_alt.png")
         self.wm_iconphoto(False, ico)
 
         # create main frame

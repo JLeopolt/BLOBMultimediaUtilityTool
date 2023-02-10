@@ -30,6 +30,8 @@ class Console(tk.scrolledtext.ScrolledText):
         self.tag_configure('warning', background="orange")
         self.tag_configure('success', background="green", foreground="white")
         self.tag_configure('notice', background="blue", foreground="white")
+        # selection should show up always
+        self.tag_raise("sel")
 
     # Prevents modification of the Text widget, EVEN by the software.
     # Also scrolls to the bottom, since this is usually called after inserting.

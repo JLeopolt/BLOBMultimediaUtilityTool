@@ -83,20 +83,6 @@ class MainFrame(ttk.Frame):
         # determine which function to call
         self.worker_thread = None
 
-        # Determine which URL Mode to use.
-        URL_MODE = self.short_cuts.URL_Mode
-        if URL_MODE == 0:
-            # Youtube mode will treat the URL as a YouTube video
-            self.worker_thread = Thread(target=loader.load_youtube_video, args=[self])
-        elif URL_MODE == 1:
-            # BLOB mode will treat the URL as a direct BLOB link.
-            self.worker_thread = Thread(target=loader.load_BLOB, args=[self])
-        elif URL_MODE == 2:
-            # Files mode will treat the URL as a direct file URL.
-            self.worker_thread = Thread(target=loader.load_file_URL, args=[self])
-        elif URL_MODE == 3:
-            # TODO: Scan mode
-            x = 0
-
-        # start the process on the worker thread.
+        # load the media on a worker thread
+        self.worker_thread = Thread(target=loader.load, args=[self])
         self.worker_thread.start()

@@ -40,14 +40,26 @@ def get_save_location():
     return default_save_directory
 
 
-# Contains metadata about a file url.
-class FileURLMetadata:
+# Contains metadata about a url.
+class URLMetadata:
 
-    def __init__(self, file_URL):
+    def __init__(self, url):
         super().__init__()
-        self.url = file_URL
-        parsed = urlparse(file_URL)
+
+        # get metadata
+        parsed = urlparse(url)
+
+        # setup all data
+        self.url = url
         self.filename = os.path.basename(parsed.path)
         self.domain = parsed.netloc
         self.host_addr = str(socket.gethostbyname_ex(parsed.netloc)[2])
 
+        # determine URL mode
+        # youtube urls may have subdomain in front, so check if they END with the domain
+        if self.domain.endswith('youtube.com') or self.domain.endswith('youtu.be'):
+            # URL MODE - Youtube
+            self.isYoutube = True
+            return
+        # URL MODE - Scan
+        self.isYoutube = False

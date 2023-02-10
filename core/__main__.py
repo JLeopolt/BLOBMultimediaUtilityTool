@@ -5,7 +5,7 @@ import core.graphics.gui as gui
 
 
 def get_software_details():
-    details = "BLOB Multimedia Utility Tool v" + core.__version__
+    details = "Multimedia Utility Download Tool v" + core.__version__
     details += '\n' + "Copyright (c) 2023 PyroNeon Software. Licensed under GPL-3.0 License."
     return details
 
