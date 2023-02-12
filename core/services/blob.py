@@ -13,7 +13,10 @@ class HTMLScanner:
         self.soup = bs4.BeautifulSoup(self.html, 'html.parser')
 
     def find_video(self):
-        return self.find_urls_regex()[0]
+        url_list = self.find_urls_regex()
+        if url_list.__len__() == 0:
+            return None
+        return url_list[0]
 
     # Uses regex to find all .mp4 links in the file.
     def find_urls_regex(self):

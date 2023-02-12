@@ -82,7 +82,12 @@ def load_scan(main, url_meta):
     start_time = time.time()
 
     scanner = blob.HTMLScanner(url_meta)
-    video_url_meta = files.URLMetadata(scanner.find_video())
+    vid_url = scanner.find_video()
+    if vid_url is None:
+        main.console.printError('Could not find an .mp4 video file at that URL.')
+        main.short_cuts.unblock_new_processes()
+        return
+    video_url_meta = files.URLMetadata(vid_url)
 
     # resets, then builds the metadata frame
     main.metadata_frame.build_from_url(video_url_meta)
