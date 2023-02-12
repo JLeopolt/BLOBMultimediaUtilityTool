@@ -1,4 +1,5 @@
 import tkinter as tk
+from threading import Thread
 from tkinter import ttk
 
 from core.graphics.common import utils
@@ -89,31 +90,6 @@ class ConvertFrame(ttk.LabelFrame):
 
         # the final request can be submitted in this section
         finish_frame = self.build_finish_frame(dir_f.download, url_meta)
-        finish_frame.pack(side='left', expand=True)
-
-    # expects a BLOB url in a FileURLMetadata object
-    def build_from_blob(self, blob_meta):
-        # reset frame
-        self.reset()
-        self.enable_stream_select = False
-
-        # build output mode frame.
-        self.output_mode = tk.StringVar()
-        output_mode_frame = self.build_output_mode_frame()
-        output_mode_frame.pack(side='left', expand=True)
-
-        # download source is shown in this section
-        source_select_frame = ttk.Frame(self)
-        ttk.Label(source_select_frame, text='Download Streams').pack()
-        ttk.Label(source_select_frame, text='File: ' + blob_meta.filename).pack()
-        source_select_frame.pack(side='left', expand=True)
-
-        # the file conversion takes place here
-        file_convert_frame = self.build_file_convert_frame(self.preset_video_filetypes)
-        file_convert_frame.pack(side='left', expand=True)
-
-        # the final request can be submitted in this section
-        finish_frame = self.build_finish_frame(blob.download, blob_meta)
         finish_frame.pack(side='left', expand=True)
 
     # Selects which output mode to use. Changes which options show up in the converter tab when selected.
@@ -223,8 +199,13 @@ class ConvertFrame(ttk.LabelFrame):
         finish_frame = ttk.Frame(self)
         ttk.Label(finish_frame, text='Finish').pack()
 
-        ttk.Button(finish_frame, text='Download', command=lambda: funct(self, data),).pack()
+        ttk.Button(finish_frame, text='Download', command=lambda: self.async_download(funct, data)).pack()
         return finish_frame
+
+    def async_download(self, funct, data):
+        # execute on a new thread
+        worker_thread = Thread(target=funct, args=[self, data])
+        worker_thread.start()
 
     # returns the filename in form: <filename>.<extension>
     def get_output_filename(self, filename):

@@ -82,56 +82,15 @@ def load_scan(main, url_meta):
     start_time = time.time()
 
     scanner = blob.HTMLScanner(url_meta)
-    video_url = scanner.find_video()
-    main.console.printSuccess('Found video url: '+video_url)
+    video_url_meta = files.URLMetadata(scanner.find_video())
 
     # resets, then builds the metadata frame
-    # main.metadata_frame.build_from_url(url_meta)
+    main.metadata_frame.build_from_url(video_url_meta)
 
     # Readies the Converter frame.
-    # main.convert_frame.build_from_file(url_meta)
+    main.convert_frame.build_from_file(video_url_meta)
 
     # Unblock shortcuts
     main.short_cuts.unblock_new_processes()
 
     main.console.printSuccess("Got file metadata. (" + str(round(time.time() - start_time, 2)) + "s)")
-
-
-# takes in the main frame. loads in BLOB media from the link provided.
-# should be called asynchronously.
-def load_BLOB(main):
-    main.short_cuts.block_new_processes()
-
-    # Get the file URL
-    blob_url = main.link_entry_field.get()
-    if utils.trim(blob_url) == '':
-        main.console.printError("No URL was provided.")
-        main.short_cuts.unblock_new_processes()
-        return
-
-    # check if the URL is valid.
-    try:
-        # ignore the 'blob:' part.
-        requests.head(blob_url.split("blob:")[1])
-    except (Exception,) as e:
-        print(e)
-        main.console.printError("Input is not a valid URL.")
-        main.short_cuts.unblock_new_processes()
-        return
-
-    # Start the progress bar
-    start_time = time.time()
-
-    # get metadata
-    blob_meta = files.URLMetadata(blob_url)
-
-    # resets, then builds the metadata frame
-    main.metadata_frame.build_from_url(blob_meta)
-
-    # Readies the Converter frame.
-    main.convert_frame.build_from_blob(blob_meta)
-
-    # Unblock shortcuts
-    main.short_cuts.unblock_new_processes()
-
-    main.console.printSuccess("Got BLOB URL metadata. (" + str(round(time.time() - start_time, 2)) + "s)")

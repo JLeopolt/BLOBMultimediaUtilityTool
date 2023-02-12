@@ -66,7 +66,7 @@ class MetadataFrame(ttk.LabelFrame):
         self.reset()
 
         # The thumbnail image
-        thumbnail_image = self.create_thumbnail("core/assets/no-source.png")
+        thumbnail_image = self.create_thumbnail("assets/no-source.png")
         thumbnail = ttk.Label(self, image=thumbnail_image)
         thumbnail.pack(side='left', anchor='nw')
 
