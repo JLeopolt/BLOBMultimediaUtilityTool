@@ -1,4 +1,5 @@
 import tkinter as tk
+import webbrowser
 from tkinter import ttk
 
 import core
@@ -52,7 +53,7 @@ class App(tk.Tk):
 
         # Prepare HelpMenu
         help_menu = tk.Menu(menubar, tearoff=0)
-        help_menu.add_command(label="About")
+        help_menu.add_command(label="About", command=lambda: webbrowser.open('https://www.pyroneon.ml/mudtool'))
         menubar.add_cascade(label="Help", menu=help_menu)
 
         # Add the Menu to window
