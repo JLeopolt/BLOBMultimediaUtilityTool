@@ -9,3 +9,7 @@ Do not remove the executable file from within the extracted folder.
 If you have any inquiries, contact us <a href="https://www.pyroneon.ml/contact-us/email">here</a>.
 
 Visit the official website for MUD Tool <a href="https://www.pyroneon.ml/mudtool">here</a>.
+
+<b>Disclaimer:</b><br>
+Abusing this software to download copyrighted content without permission from the copyright holder is illegal.
+If you know someone who is abusing our software, please <a href="https://www.pyroneon.ml/contact-us/email">contact us</a> so we can notify the proper authorities!
