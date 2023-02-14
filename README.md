@@ -1,5 +1,5 @@
 # Multimedia Utility Download Tool
-<h4>By PyroNeon Software</h4>
+<h4>From PyroNeon Software</h4>
 
 <h2>About</h2>
 MUD Tool (Multimedia Utility Download Tool) is a powerful program which allows you to download and convert media files from the web. If you've ever been browsing the web and wanted to download a video, but it's locked behind a paywall or asks you to sign up to download, just use the MUD Tool!
@@ -20,5 +20,5 @@ If you know someone who is abusing our software, please <a href="https://www.pyr
 
 <br>
 If you have any inquiries, contact us <a href="https://www.pyroneon.ml/contact-us/email">here</a>.<br>
-Visit the official website for MUD Tool <a href="https://www.pyroneon.ml/mudtool">here</a>.
+Visit the official website for MUD Tool <a href="https://www.pyroneon.ml/mudtool">here</a>.<br>
 <b> Licensed under GNU GPL-3.0 License. </b>
