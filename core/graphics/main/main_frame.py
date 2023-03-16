@@ -5,6 +5,7 @@ from core.services import loader
 from core.graphics.common import console as cs, utils
 from core.graphics.main import scontrols as shortcuts
 from core.graphics.main.modules import convert_frame, metadata_frame as metadata
+import sys
 
 
 # noinspection PyAttributeOutsideInit
@@ -20,6 +21,9 @@ class MainFrame(ttk.Frame):
         self.console_frame = ttk.LabelFrame(self, text='Console')
         self.console = cs.Console(self.console_frame)
         self.console.pack(side='bottom', expand=True, fill='both')
+
+        sys.stdout = cs.TextRedirector(self.console, 'stdout')
+        sys.stderr = cs.TextRedirector(self.console, 'stderr')
 
         self.build()
 

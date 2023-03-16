@@ -75,6 +75,7 @@ class MetadataFrame(ttk.LabelFrame):
         metadata.pack(side='left', anchor='nw')
 
         # Get all metadata from the file URL without downloading it.
-        tk.Label(metadata, text="File: " + url_meta.filename).pack(side='top', expand=True, anchor='nw')
+        video_title_label = tk.Label(metadata, text="Filename: " + url_meta.filename)
+        video_title_label.pack(side='top', expand=True, anchor='nw')
         tk.Label(metadata, text="Website: " + url_meta.domain).pack(side='top', expand=True, anchor='nw')
         tk.Label(metadata, text="Resolved DNS: " + url_meta.host_addr).pack(side='top', expand=True, anchor='nw')

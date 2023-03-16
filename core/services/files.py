@@ -40,6 +40,14 @@ def get_save_location():
     return default_save_directory
 
 
+# Expects a String. Returns a cleaned-up version, which is suitable for a file name.
+def clean_filename(name):
+    # Remove any illegal characters.
+    fix = str(name).replace("\\", "").replace("/", "").replace(":", "").replace("*", "").replace("?", "")\
+        .replace("\"", "").replace("<", "").replace(">", "").replace("|", "")
+    return fix
+
+
 # Contains metadata about a url.
 class URLMetadata:
 
