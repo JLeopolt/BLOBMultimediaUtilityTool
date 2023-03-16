@@ -43,8 +43,14 @@ class App(tk.Tk):
         for theme_name in self.style.theme_names():
             themes_submenu.add_command(label=theme_name, command=lambda t=theme_name: self.style.theme_use(t))
         file_menu.add_cascade(label="Styles", menu=themes_submenu)
+
+        # 'Console' submenu
+        console_submenu = tk.Menu(file_menu, tearoff=0)
         # clears the console
-        file_menu.add_command(label="Clear Console", command=self.youtube_tab.console.clear)
+        console_submenu.add_command(label="Clear", command=self.youtube_tab.console.clear)
+        # saves a log of the console
+        console_submenu.add_command(label="Save History", command=self.youtube_tab.console.save_log)
+        file_menu.add_cascade(label="Console", menu=console_submenu)
 
         file_menu.add_separator()
         # exits the program

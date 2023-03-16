@@ -1,10 +1,11 @@
+import os
 import tkinter as tk
 import tkinter.scrolledtext as scrolledtext
 from datetime import datetime
-
-import sys
+from tkinter import filedialog
 
 import core.__main__
+import core.services.files as files
 
 
 def get_date_time():
@@ -24,6 +25,9 @@ class Console(tk.scrolledtext.ScrolledText):
         self['font'] = ('consolas', '10')
         self.setup_console_tags()
 
+        # timestamp of program launch.
+        self.printNotice("Console started.")
+
         # Add application information
         self.print(core.__main__.get_software_details())
 
@@ -38,6 +42,35 @@ class Console(tk.scrolledtext.ScrolledText):
 
         # selection should show up always
         self.tag_raise("sel")
+
+    # saves the console history to a file.
+    def save_log(self):
+        # possible file types to allow
+        file_types = [('MUD Log', '*.mudlog'),
+                      ('Text Document', '*.txt'),
+                      ('All Files', '*.*')]
+
+        # save as a .log file, named MUD-Log-<time date>.log by default.
+        # returns file
+        file = filedialog.asksaveasfile(initialdir=os.getcwd(),
+                                        title='Save Console Log',
+                                        defaultextension='*.mudlog',
+                                        filetypes=file_types,
+                                        initialfile="MUD-Log-" + get_date_time().replace("/", "-")
+                                                                                .replace(" ", "-")
+                                                                                .replace(":", "-"))
+
+        # if cancelled save operation
+        if file is None:
+            self.printWarning('Cancelled save console log operation.')
+            return
+
+        # write the widget contents to the file
+        file.write(self.get("1.0", 'end'))
+        file.close()
+
+        # inform the user that the log was saved.
+        self.printInfo('Saved console log as \"' + str(file.name) + "\"")
 
     # Prevents modification of the Text widget, EVEN by the software.
     # Also scrolls to the bottom, since this is usually called after inserting.
@@ -75,7 +108,7 @@ class Console(tk.scrolledtext.ScrolledText):
         if content == '\n':
             return
         self.enable()
-        self.insert('end', get_date_time() + " " + stdType + ": " + content + "\n", stdType)
+        self.insert('end', get_date_time() + " " + content + "\n", stdType)
         self.disable()
 
     def printError(self, content):

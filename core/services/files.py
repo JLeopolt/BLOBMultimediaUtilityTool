@@ -20,7 +20,7 @@ def prompt_update_default_save_directory(console):
 
     new_dir = filedialog.askdirectory(initialdir=default_save_directory, title='Update Default Save Location')
     if was_cancelled(new_dir):
-        console.printError('Cancelled *SaveDir update, *SaveDir will remain \"'+default_save_directory+"\"")
+        console.printWarning('Cancelled *SaveDir update, *SaveDir will remain \"'+default_save_directory+"\"")
         return
 
     default_save_directory = new_dir
