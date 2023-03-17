@@ -27,7 +27,7 @@ def download(convert_frame, youtube):
         return
     # Setup
     mode = convert_frame.output_mode.get()
-    output_filename = convert_frame.get_output_filename(youtube.title)
+    output_filename = files.clean_filename(convert_frame.get_output_filename(youtube.title))
     output_filepath = save_dir + "/" + output_filename
     # account for root dirs
     if save_dir[-1] == "/":

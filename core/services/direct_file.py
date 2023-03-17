@@ -23,7 +23,7 @@ def download(convert_frame, url_meta):
 
     # Setup
     mode = convert_frame.output_mode.get()
-    output_filename = convert_frame.get_output_filename(pathlib.Path(url_meta.filename).stem)
+    output_filename = files.clean_filename(convert_frame.get_output_filename(pathlib.Path(url_meta.filename).stem))
     output_filepath = get_filepath_from_save_dir(output_filename, save_dir)
 
     # Get the requested output filetype.

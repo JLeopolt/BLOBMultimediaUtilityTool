@@ -5,7 +5,7 @@ from tkinter import ttk
 from core.graphics.common import utils
 from core.graphics.common.progressbar import ProgressBar
 from core.graphics.main.modules.stream_selector import StreamSelector
-from core.services import youtube as yt, direct_file as dir_f, blob
+from core.services import youtube as yt, direct_file as dir_f
 
 
 # The display frame which allows the user to select a download stream, convert file types, etc.
