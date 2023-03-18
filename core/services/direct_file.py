@@ -52,7 +52,14 @@ def download(convert_frame, url_meta):
         # perform the ffmpeg conversion and download.
         f_input = ffmpeg.input(local_path)
         operation = ffmpeg.output(f_input, output_filepath, vf="pad=ceil(iw/2)*2:ceil(ih/2)*2")
-        operation.run(overwrite_output=True)
+        try:
+            operation.run(overwrite_output=True, quiet=True)
+        except ffmpeg.Error as ex:
+            # print error messages from FFMPEG before deleting temp files and throwing exception.
+            print(ex.stdout.decode('utf8'))
+            print(ex.stderr.decode('utf8'))
+            cleanup_temp_files()
+            raise ex
 
         # delete temp files leftover
         cleanup_temp_files()
@@ -67,7 +74,14 @@ def download(convert_frame, url_meta):
         # perform the conversion and download
         f_input = ffmpeg.input(local_path)
         operation = ffmpeg.output(f_input, output_filepath, vf="pad=ceil(iw/2)*2:ceil(ih/2)*2")
-        operation.run(overwrite_output=True)
+        try:
+            operation.run(overwrite_output=True, quiet=True)
+        except ffmpeg.Error as ex:
+            # print error messages from FFMPEG before deleting temp files and throwing exception.
+            print(ex.stdout.decode('utf8'))
+            print(ex.stderr.decode('utf8'))
+            cleanup_temp_files()
+            raise ex
 
         # delete temp files leftover
         cleanup_temp_files()
@@ -82,7 +96,14 @@ def download(convert_frame, url_meta):
         # perform the conversion and download
         f_input = ffmpeg.input(local_path)
         operation = ffmpeg.output(f_input, output_filepath, vf="pad=ceil(iw/2)*2:ceil(ih/2)*2", an=None)
-        operation.run(overwrite_output=True)
+        try:
+            operation.run(overwrite_output=True, quiet=True)
+        except ffmpeg.Error as ex:
+            # print error messages from FFMPEG before deleting temp files and throwing exception.
+            print(ex.stdout.decode('utf8'))
+            print(ex.stderr.decode('utf8'))
+            cleanup_temp_files()
+            raise ex
 
         # delete temp files leftover
         cleanup_temp_files()

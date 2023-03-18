@@ -28,6 +28,7 @@ def download(convert_frame, youtube):
     # Setup
     mode = convert_frame.output_mode.get()
     output_filename = files.clean_filename(convert_frame.get_output_filename(youtube.title))
+
     output_filepath = save_dir + "/" + output_filename
     # account for root dirs
     if save_dir[-1] == "/":
@@ -50,7 +51,14 @@ def download(convert_frame, youtube):
         operation = ffmpeg.concat(src_vid, src_aud, v=1, a=1)
         # get audio and video codecs
         operation = operation.output(output_filepath)
-        operation.run(overwrite_output=True)
+        try:
+            operation.run(overwrite_output=True, quiet=True)
+        except ffmpeg.Error as ex:
+            # print error messages from FFMPEG before deleting temp files and throwing exception.
+            print(ex.stdout.decode('utf8'))
+            print(ex.stderr.decode('utf8'))
+            cleanup_temp_files()
+            raise ex
 
         # delete temp files leftover
         cleanup_temp_files()
@@ -69,7 +77,14 @@ def download(convert_frame, youtube):
 
         # perform the conversion and download
         operation = ffmpeg.output(src_aud, output_filepath)
-        operation.run(overwrite_output=True)
+        try:
+            operation.run(overwrite_output=True, quiet=True)
+        except ffmpeg.Error as ex:
+            # print error messages from FFMPEG before deleting temp files and throwing exception.
+            print(ex.stdout.decode('utf8'))
+            print(ex.stderr.decode('utf8'))
+            cleanup_temp_files()
+            raise ex
 
         # delete temp files leftover
         cleanup_temp_files()
@@ -88,7 +103,14 @@ def download(convert_frame, youtube):
 
         # perform the conversion and download
         operation = ffmpeg.output(src_vid, output_filepath)
-        operation.run(overwrite_output=True)
+        try:
+            operation.run(overwrite_output=True, quiet=True)
+        except ffmpeg.Error as ex:
+            # print error messages from FFMPEG before deleting temp files and throwing exception.
+            print(ex.stdout.decode('utf8'))
+            print(ex.stderr.decode('utf8'))
+            cleanup_temp_files()
+            raise ex
 
         # delete temp files leftover
         cleanup_temp_files()
