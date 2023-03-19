@@ -64,8 +64,22 @@ def setup_console_tags():
     widget.tag_configure('stdout', background="white", foreground="blue")
     widget.tag_configure('stderr', background="white", foreground="red")
 
+    widget.tag_configure('link-open-file', background="white", foreground="blue", underline=True)
+    widget.tag_bind('link-open-file', '<Button-1>', link_open_file_location)
+
     # selection highlight should take priority over tags.
     widget.tag_raise("sel")
+
+
+def link_open_file_location(event):
+    location = event.widget.tag_names('current')[1]
+
+    # ignore selections
+    if location == 'sel':
+        return
+
+    # open the file in explorer
+    os.system('explorer /select,\"' + location.replace('/', '\\') + "\"")
 
 
 # saves the console history to a file.
@@ -120,9 +134,9 @@ def clear():
     print_startup_info()
 
 
-def printConsole(msg):
+def addHyperlinkOpenFile(text, file_location):
     enable()
-    widget.insert('end', msg + "\n")
+    widget.insert('end', text + "\n", ('link-open-file', file_location))
     disable()
 
 
@@ -143,7 +157,7 @@ def printStdOutput(stdType, content):
     if utils.trim(content) is None or "":
         return
     enable()
-    widget.insert('end', utils.get_date_time() + " " + content.strip() + "\n", stdType)
+    widget.insert('end', utils.get_date_time() + " " + content + "\n", stdType)
     disable()
 
 
@@ -170,11 +184,17 @@ def printWarning(content):
 # used to redirect std output to the console.
 class TextRedirector(object):
     def __init__(self, tag="stdout"):
+        self.hide_end = False
         self.tag = tag
 
     # called by stdout/stderr when writing python console output to widget.
     def write(self, std):
-        printStdOutput(str(self.tag), std)
+        # since print() statements call write() twice, ignore every Second write() call.
+        if not self.hide_end:
+            printStdOutput(self.tag, std)
+            self.hide_end = True
+        else:
+            self.hide_end = False
 
     def flush(self):
         pass

@@ -63,7 +63,9 @@ def configure_menubar(style):
     themes_submenu = tk.Menu(styles_menu, tearoff=0)
     # Add all theme options
     for theme_name in style.theme_names():
-        themes_submenu.add_command(label=theme_name, command=lambda t=theme_name: style.theme_use(t))
+        themes_submenu.add_radiobutton(label=theme_name,
+                                       command=lambda t=theme_name: style.theme_use(t),
+                                       indicatoron=True)
     styles_menu.add_cascade(label="Themes", menu=themes_submenu)
 
     # 'Fonts' submenu

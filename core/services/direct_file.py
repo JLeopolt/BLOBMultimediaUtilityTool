@@ -68,6 +68,8 @@ def download(url_meta):
         # print confirmation message
         console.printSuccess('Video file has been saved to \"' + output_filepath + "\". (" +
                              str(round(time.time() - start_time, 2)) + "s)")
+        # add hyperlink to open the file
+        console.addHyperlinkOpenFile('Show File in Explorer', output_filepath)
 
     elif mode == 'Audio':
         start_time = time.time()
@@ -90,6 +92,8 @@ def download(url_meta):
         # print confirmation message
         console.printSuccess('Audio file has been saved to \"' + output_filepath + "\". (" +
                              str(round(time.time() - start_time, 2)) + "s)")
+        # add hyperlink to open the file
+        console.addHyperlinkOpenFile('Show File in Explorer', output_filepath)
 
     elif mode == 'Mute Video':
         start_time = time.time()
@@ -112,6 +116,8 @@ def download(url_meta):
         # print confirmation message
         console.printSuccess('Mute video file has been saved to \"' + output_filepath +
                              "\". (" + str(round(time.time() - start_time, 2)) + "s)")
+        # add hyperlink to open the file
+        console.addHyperlinkOpenFile('Show File in Explorer', output_filepath)
 
 
 # Gets a filepath from a filename (with ext) and directory.

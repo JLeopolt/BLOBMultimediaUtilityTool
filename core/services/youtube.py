@@ -66,6 +66,8 @@ def download(youtube):
         # print confirmation message
         console.printSuccess('Video file has been saved to \"' + output_filepath + "\". (" +
                              str(round(time.time() - start_time, 2)) + "s)")
+        # add hyperlink to open the file
+        console.addHyperlinkOpenFile('Show File in Explorer', output_filepath)
 
     elif mode == 'Audio':
         # download the audio stream, plug the temporary location into ffmpeg.
@@ -92,6 +94,8 @@ def download(youtube):
         # print confirmation message
         console.printSuccess('Audio file has been saved to \"' + output_filepath + "\". (" +
                              str(round(time.time() - start_time, 2)) + "s)")
+        # add hyperlink to open the file
+        console.addHyperlinkOpenFile('Show File in Explorer', output_filepath)
 
     elif mode == 'Mute Video':
         # download the video stream, plug the temporary location into ffmpeg.
@@ -118,6 +122,8 @@ def download(youtube):
         # print confirmation message
         console.printSuccess('Mute video file has been saved to \"' + output_filepath +
                              "\". (" + str(round(time.time() - start_time, 2)) + "s)")
+        # add hyperlink to open the file
+        console.addHyperlinkOpenFile('Show File in Explorer', output_filepath)
 
 
 # downloads a stream temporarily, returns the filepath.

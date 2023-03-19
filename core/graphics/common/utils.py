@@ -52,8 +52,8 @@ def pack_forget_children(frame):
 
 
 # Removes all whitespace, tab, newline, etc. from a string and returns.
-def trim(string):
-    return string.strip(' \t\n\r')
+def trim(text):
+    return text.replace(" ", "").replace("\n", "").replace("\t", "").replace("\r", "")
 
 
 # Returns date time in M/D/Y H:M:S format.
