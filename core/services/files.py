@@ -2,9 +2,16 @@ import os
 import socket
 from urllib.parse import urlparse
 from tkinter import filedialog
-from core.graphics.common import utils
+from core.graphics.common import utils, console
 
+# preset file types for videos
+video_filetypes = ['.mp4', '.mov', '.wmv', '.avi', '.mkv', '.webm']
+# preset file types for audio
+audio_filetypes = ['.mp3', '.wav', '.ogg', '.flac', '.aiff']
+
+# self-explanatory
 default_save_directory = "/"
+# whether to prompt the user for a save location before downloading, or to automatically download to default dir.
 prompt_for_downloads = True
 
 
@@ -15,7 +22,7 @@ def was_cancelled(filepath):
 
 # Asks the user to update their default save directory. Requires console to print a success message.
 # Returns nothing.
-def prompt_update_default_save_directory(console):
+def prompt_update_default_save_directory():
     global default_save_directory
 
     new_dir = filedialog.askdirectory(initialdir=default_save_directory, title='Update Default Save Location')

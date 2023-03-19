@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 # Creates a descriptor title for a download stream.
 def get_source_title(source):
     title = "."
@@ -51,3 +54,9 @@ def pack_forget_children(frame):
 # Removes all whitespace, tab, newline, etc. from a string and returns.
 def trim(string):
     return string.strip(' \t\n\r')
+
+
+# Returns date time in M/D/Y H:M:S format.
+def get_date_time():
+    now = datetime.now()
+    return now.strftime("%m/%d/%Y %H:%M:%S")

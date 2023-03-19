@@ -1,141 +1,159 @@
 import os
+import sys
 import tkinter as tk
 import tkinter.scrolledtext as scrolledtext
-from datetime import datetime
 from tkinter import filedialog
 
-import core.__main__
-import core.services.files as files
+import core.__main__ as mainpy
+import core.graphics.common.utils as utils
+
+# Until the start() method is called, the widget is just a placeholder.
+widget: tk.scrolledtext.ScrolledText
 
 
-def get_date_time():
-    now = datetime.now()
-    return now.strftime("%d/%m/%Y %H:%M:%S")
+# Create the console and add it to the specified container.
+def build(parent):
+    global widget
+    widget = tk.scrolledtext.ScrolledText(parent, undo=True, wrap='word')
+    widget.pack(side='bottom', expand=True, fill='both')
+
+    # Redirect std to console using TextRedirector class.
+    sys.stdout = TextRedirector('stdout')
+    sys.stderr = TextRedirector('stderr')
+
+    # set the font
+    widget['font'] = ('consolas', '10')
+    setup_console_tags()
+
+    # timestamp of program launch.
+    printNotice("Successfully started console.")
+
+    print_startup_info()
 
 
-class Console(tk.scrolledtext.ScrolledText):
+def print_startup_info():
+    # print software / license info.
+    printInfo(mainpy.get_software_details() + "\n" + mainpy.get_license_details())
 
-    def __init__(self, container):
-        super().__init__(container, undo=True, wrap='word')
 
-        # disable manual input
-        self.disable()
+# creates all the console 'tags' which are color schemes for the text. Used to highlight errors, info, success, etc.
+def setup_console_tags():
+    widget.tag_configure('error', background="yellow", foreground="red")
+    widget.tag_configure('warning', background="orange")
+    widget.tag_configure('success', background="green", foreground="white")
+    widget.tag_configure('notice', background="blue", foreground="white")
 
-        # set the font
-        self['font'] = ('consolas', '10')
-        self.setup_console_tags()
+    widget.tag_configure('stdout', background="white", foreground="blue")
+    widget.tag_configure('stderr', background="white", foreground="red")
 
-        # timestamp of program launch.
-        self.printNotice("Console started.")
+    # selection highlight should take priority over tags.
+    widget.tag_raise("sel")
 
-        # Add application information
-        self.print(core.__main__.get_software_details())
 
-    def setup_console_tags(self):
-        self.tag_configure('error', background="yellow", foreground="red")
-        self.tag_configure('warning', background="orange")
-        self.tag_configure('success', background="green", foreground="white")
-        self.tag_configure('notice', background="blue", foreground="white")
+# saves the console history to a file.
+def save_log():
+    # possible file types to allow
+    file_types = [('MUD Log', '*.mudlog'),
+                  ('Text Document', '*.txt'),
+                  ('All Files', '*.*')]
 
-        self.tag_configure('stdout', background="white", foreground="blue")
-        self.tag_configure('stderr', background="white", foreground="red")
+    # save as a .log file, named MUD-Log-<time date>.log by default.
+    # returns file
+    file = filedialog.asksaveasfile(initialdir=os.getcwd(),
+                                    title='Save Console Log',
+                                    defaultextension='*.mudlog',
+                                    filetypes=file_types,
+                                    initialfile="MUD-Log-" + utils.get_date_time().replace("/", "-")
+                                    .replace(" ", "-")
+                                    .replace(":", "-"))
 
-        # selection should show up always
-        self.tag_raise("sel")
+    # if cancelled save operation
+    if file is None:
+        printWarning('Cancelled save console log operation.')
+        return
 
-    # saves the console history to a file.
-    def save_log(self):
-        # possible file types to allow
-        file_types = [('MUD Log', '*.mudlog'),
-                      ('Text Document', '*.txt'),
-                      ('All Files', '*.*')]
+    # write the widget contents to the file
+    file.write(widget.get("1.0", 'end'))
+    file.close()
 
-        # save as a .log file, named MUD-Log-<time date>.log by default.
-        # returns file
-        file = filedialog.asksaveasfile(initialdir=os.getcwd(),
-                                        title='Save Console Log',
-                                        defaultextension='*.mudlog',
-                                        filetypes=file_types,
-                                        initialfile="MUD-Log-" + get_date_time().replace("/", "-")
-                                                                                .replace(" ", "-")
-                                                                                .replace(":", "-"))
+    # inform the user that the log was saved.
+    printInfo('Saved console log as \"' + str(file.name) + "\"")
 
-        # if cancelled save operation
-        if file is None:
-            self.printWarning('Cancelled save console log operation.')
-            return
 
-        # write the widget contents to the file
-        file.write(self.get("1.0", 'end'))
-        file.close()
+# Prevents modification of the Text widget, EVEN by the software.
+# Also scrolls to the bottom, since this is usually called after inserting.
+def disable():
+    widget.configure(state='disabled')
+    widget.see(tk.END)
 
-        # inform the user that the log was saved.
-        self.printInfo('Saved console log as \"' + str(file.name) + "\"")
 
-    # Prevents modification of the Text widget, EVEN by the software.
-    # Also scrolls to the bottom, since this is usually called after inserting.
-    def disable(self):
-        self.configure(state='disabled')
-        self.see(tk.END)
+# Enables all forms of modification of the Text widget.
+def enable():
+    widget.configure(state='normal')
 
-    # Enables all forms of modification of the Text widget.
-    def enable(self):
-        self.configure(state='normal')
 
-    # Clears the entire console, then reposts the software details info.
-    def clear(self):
-        self.enable()
-        self.delete('1.0', 'end')
-        self.print(core.__main__.get_software_details())
+# Clears the entire console, then reposts the software details info.
+def clear():
+    enable()
+    widget.delete('1.0', 'end')
+    print_startup_info()
 
-    def print(self, msg):
-        self.enable()
-        self.insert('end', msg + "\n")
-        self.disable()
 
-    def printHeaderWithTimestamp(self, header, content, tag):
-        self.enable()
-        self.insert('end', get_date_time() + " " + header + ": " + content + "\n", tag)
-        self.disable()
+def printConsole(msg):
+    enable()
+    widget.insert('end', msg + "\n")
+    disable()
 
-    def printHeaderWithTimestampUntagged(self, header, content):
-        self.enable()
-        self.insert('end', get_date_time() + " " + header + ": " + content + "\n")
-        self.disable()
 
-    # the console will print the output with 'stdout' or 'stderr' as the header / tag.
-    def printConsoleOutput(self, stdType, content):
-        if content == '\n':
-            return
-        self.enable()
-        self.insert('end', get_date_time() + " " + content + "\n", stdType)
-        self.disable()
+def printHeaderWithTimestamp(header, content, tag):
+    enable()
+    widget.insert('end', utils.get_date_time() + " " + header + ": " + content + "\n", tag)
+    disable()
 
-    def printError(self, content):
-        self.printHeaderWithTimestamp("(ERROR)", content, 'error')
 
-    def printSuccess(self, content):
-        self.printHeaderWithTimestamp("(SUCCESS)", content, 'success')
+def printHeaderWithTimestampUntagged(header, content):
+    enable()
+    widget.insert('end', utils.get_date_time() + " " + header + ": " + content + "\n")
+    disable()
 
-    def printInfo(self, content):
-        self.printHeaderWithTimestampUntagged("(INFO)", content)
 
-    def printNotice(self, content):
-        self.printHeaderWithTimestamp("(NOTICE)", content, 'notice')
+# the console will print the output with 'stdout' or 'stderr' as the header / tag.
+def printStdOutput(stdType, content):
+    if utils.trim(content) is None or "":
+        return
+    enable()
+    widget.insert('end', utils.get_date_time() + " " + content.strip() + "\n", stdType)
+    disable()
 
-    def printWarning(self, content):
-        self.printHeaderWithTimestamp("(WARN)", content, 'warning')
+
+def printError(content):
+    printHeaderWithTimestamp("(ERROR)", content, 'error')
+
+
+def printSuccess(content):
+    printHeaderWithTimestamp("(SUCCESS)", content, 'success')
+
+
+def printInfo(content):
+    printHeaderWithTimestampUntagged("(INFO)", content)
+
+
+def printNotice(content):
+    printHeaderWithTimestamp("(NOTICE)", content, 'notice')
+
+
+def printWarning(content):
+    printHeaderWithTimestamp("(WARN)", content, 'warning')
 
 
 # used to redirect std output to the console.
 class TextRedirector(object):
-    def __init__(self, console, tag="stdout"):
-        self.console = console
+    def __init__(self, tag="stdout"):
         self.tag = tag
 
     # called by stdout/stderr when writing python console output to widget.
     def write(self, std):
-        self.console.printConsoleOutput(str(self.tag), std)
+        printStdOutput(str(self.tag), std)
 
     def flush(self):
         pass
