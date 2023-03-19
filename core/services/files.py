@@ -1,5 +1,6 @@
 import os
 import socket
+import sys
 from urllib.parse import urlparse
 from tkinter import filedialog
 from core.graphics.common import utils, console
@@ -53,6 +54,14 @@ def clean_filename(name):
     fix = str(name).replace("\\", "").replace("/", "").replace(":", "").replace("*", "").replace("?", "")\
         .replace("\"", "").replace("<", "").replace(">", "").replace("|", "")
     return fix
+
+
+# Used to retrieve asset files from a relative filepath.
+# Must use this when compiling to .exe using Pyinstaller.
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 
 # Contains metadata about a url.

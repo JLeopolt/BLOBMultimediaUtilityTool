@@ -4,6 +4,7 @@ from tkinter import ttk
 
 from core import __main__ as mainpy
 from core.graphics.common import console
+from core.services import files
 from core.graphics.main import main_frame
 
 # The main application window.
@@ -21,7 +22,7 @@ def run():
     style = ttk.Style(root)
 
     # create window icon
-    ico = tk.PhotoImage(file="assets/icon.png")
+    ico = tk.PhotoImage(file=files.resource_path("assets/icon.png"))
     root.wm_iconphoto(False, ico)
 
     # create main frame

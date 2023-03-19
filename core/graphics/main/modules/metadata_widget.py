@@ -6,6 +6,7 @@ from urllib import request
 from PIL import Image, ImageTk
 
 from core.graphics.common import utils
+from core.services import files
 
 # The metadata frame widget
 widget: ttk.LabelFrame
@@ -81,7 +82,7 @@ def build_from_url(url_meta):
     reset()
 
     # The thumbnail image
-    thumbnail_image = create_thumbnail("assets/no-source.png")
+    thumbnail_image = create_thumbnail(files.resource_path("assets/no-source.png"))
     thumbnail = ttk.Label(widget, image=thumbnail_image)
     thumbnail.pack(side='left', anchor='nw')
 

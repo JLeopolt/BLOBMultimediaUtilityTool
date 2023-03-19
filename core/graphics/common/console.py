@@ -48,7 +48,7 @@ def print_startup_info():
     if was_console_cleared:
         printNotice("Console has been cleared.")
     else:
-        printNotice("Console was launched.")
+        printNotice("Console started.")
 
     # print software / license info.
     printInfo(mainpy.get_software_details() + "\n" + mainpy.get_license_details())

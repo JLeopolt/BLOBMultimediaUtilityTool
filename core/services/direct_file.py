@@ -55,7 +55,7 @@ def download(url_meta):
         f_input = ffmpeg.input(local_path)
         operation = ffmpeg.output(f_input, output_filepath, vf="pad=ceil(iw/2)*2:ceil(ih/2)*2")
         try:
-            operation.run(overwrite_output=True, quiet=True)
+            operation.run(overwrite_output=True, quiet=True, cmd=files.resource_path("ffmpeg.exe"))
         except ffmpeg.Error as ex:
             # print error messages from FFMPEG before deleting temp files and throwing exception.
             print(ex.stdout.decode('utf8'))
@@ -79,7 +79,7 @@ def download(url_meta):
         f_input = ffmpeg.input(local_path)
         operation = ffmpeg.output(f_input, output_filepath, vf="pad=ceil(iw/2)*2:ceil(ih/2)*2")
         try:
-            operation.run(overwrite_output=True, quiet=True)
+            operation.run(overwrite_output=True, quiet=True, cmd=files.resource_path("ffmpeg.exe"))
         except ffmpeg.Error as ex:
             # print error messages from FFMPEG before deleting temp files and throwing exception.
             print(ex.stdout.decode('utf8'))
@@ -103,7 +103,7 @@ def download(url_meta):
         f_input = ffmpeg.input(local_path)
         operation = ffmpeg.output(f_input, output_filepath, vf="pad=ceil(iw/2)*2:ceil(ih/2)*2", an=None)
         try:
-            operation.run(overwrite_output=True, quiet=True)
+            operation.run(overwrite_output=True, quiet=True, cmd=files.resource_path("ffmpeg.exe"))
         except ffmpeg.Error as ex:
             # print error messages from FFMPEG before deleting temp files and throwing exception.
             print(ex.stdout.decode('utf8'))

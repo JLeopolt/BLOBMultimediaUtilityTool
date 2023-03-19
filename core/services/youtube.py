@@ -52,7 +52,7 @@ def download(youtube):
         # get audio and video codecs
         operation = operation.output(output_filepath)
         try:
-            operation.run(overwrite_output=True, quiet=True)
+            operation.run(overwrite_output=True, quiet=True, cmd=files.resource_path("ffmpeg.exe"))
         except ffmpeg.Error as ex:
             # print error messages from FFMPEG before deleting temp files and throwing exception.
             print(ex.stdout.decode('utf8'))
@@ -80,7 +80,7 @@ def download(youtube):
         # perform the conversion and download
         operation = ffmpeg.output(src_aud, output_filepath)
         try:
-            operation.run(overwrite_output=True, quiet=True)
+            operation.run(overwrite_output=True, quiet=True, cmd=files.resource_path("ffmpeg.exe"))
         except ffmpeg.Error as ex:
             # print error messages from FFMPEG before deleting temp files and throwing exception.
             print(ex.stdout.decode('utf8'))
@@ -108,7 +108,7 @@ def download(youtube):
         # perform the conversion and download
         operation = ffmpeg.output(src_vid, output_filepath)
         try:
-            operation.run(overwrite_output=True, quiet=True)
+            operation.run(overwrite_output=True, quiet=True, cmd=files.resource_path("ffmpeg.exe"))
         except ffmpeg.Error as ex:
             # print error messages from FFMPEG before deleting temp files and throwing exception.
             print(ex.stdout.decode('utf8'))
