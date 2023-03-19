@@ -42,13 +42,6 @@ def configure_menubar(style):
     # Prepare 'File' menu
     file_menu = tk.Menu(menubar, tearoff=0)
 
-    # 'Styles' submenu
-    themes_submenu = tk.Menu(file_menu, tearoff=0)
-    # Add all theme options
-    for theme_name in style.theme_names():
-        themes_submenu.add_command(label=theme_name, command=lambda t=theme_name: style.theme_use(t))
-    file_menu.add_cascade(label="Styles", menu=themes_submenu)
-
     # 'Console' submenu
     console_submenu = tk.Menu(file_menu, tearoff=0)
     # clears the console
@@ -60,7 +53,25 @@ def configure_menubar(style):
     file_menu.add_separator()
     # exits the program
     file_menu.add_command(label="Exit", command=root.quit)
+
     menubar.add_cascade(label="File", menu=file_menu)
+
+    # Prepare 'Styles' menu
+    styles_menu = tk.Menu(menubar, tearoff=0)
+
+    # 'Themes' submenu
+    themes_submenu = tk.Menu(styles_menu, tearoff=0)
+    # Add all theme options
+    for theme_name in style.theme_names():
+        themes_submenu.add_command(label=theme_name, command=lambda t=theme_name: style.theme_use(t))
+    styles_menu.add_cascade(label="Themes", menu=themes_submenu)
+
+    # 'Fonts' submenu
+    fonts_submenu = tk.Menu(file_menu, tearoff=0)
+    fonts_submenu.add_command(label="Set Console Font", command=console.open_font_selector)
+    styles_menu.add_cascade(label="Fonts", menu=fonts_submenu)
+
+    menubar.add_cascade(label="Styles", menu=styles_menu)
 
     # Prepare HelpMenu
     help_menu = tk.Menu(menubar, tearoff=0)

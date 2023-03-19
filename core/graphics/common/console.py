@@ -10,6 +10,9 @@ import core.graphics.common.utils as utils
 # Until the start() method is called, the widget is just a placeholder.
 widget: tk.scrolledtext.ScrolledText
 
+# used for logging purposes -- whether the console has been cleared since launch.
+was_console_cleared = False
+
 
 # Create the console and add it to the specified container.
 def build(parent):
@@ -22,16 +25,31 @@ def build(parent):
     sys.stderr = TextRedirector('stderr')
 
     # set the font
-    widget['font'] = ('consolas', '10')
-    setup_console_tags()
+    set_font(('consolas', '10'))
 
-    # timestamp of program launch.
-    printNotice("Successfully started console.")
+    setup_console_tags()
 
     print_startup_info()
 
 
+# opens a GUI dialog allowing the user to change the font used by console.
+def open_font_selector():
+    widget.tk.call('tk', 'fontchooser', 'configure', '-font', widget['font'], '-command', widget.register(set_font))
+    widget.tk.call('tk', 'fontchooser', 'show')
+
+
+# updates the console font.
+def set_font(font):
+    widget['font'] = font
+
+
 def print_startup_info():
+    # timestamp of console launch / clear
+    if was_console_cleared:
+        printNotice("Console has been cleared.")
+    else:
+        printNotice("Console was launched.")
+
     # print software / license info.
     printInfo(mainpy.get_software_details() + "\n" + mainpy.get_license_details())
 
@@ -94,6 +112,9 @@ def enable():
 
 # Clears the entire console, then reposts the software details info.
 def clear():
+    global was_console_cleared
+    was_console_cleared = True
+
     enable()
     widget.delete('1.0', 'end')
     print_startup_info()
