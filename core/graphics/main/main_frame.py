@@ -46,9 +46,8 @@ def clear():
     # perform graceful reset for certain frames
     metadata_widget.reset()
     convert_widget.reset()
-
-    # repack everything
-    utils.pack_forget_children(widget)
+    # destroy the widget and rebuild it
+    widget.destroy()
     build(widget.master)
 
 
