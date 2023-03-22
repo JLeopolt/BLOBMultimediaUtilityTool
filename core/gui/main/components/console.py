@@ -5,7 +5,7 @@ import tkinter.scrolledtext as scrolledtext
 from tkinter import filedialog
 
 import core.__main__ as mainpy
-import core.graphics.common.utils as utils
+import core.utility.utils as utils
 
 # Until the start() method is called, the widget is just a placeholder.
 widget: tk.scrolledtext.ScrolledText

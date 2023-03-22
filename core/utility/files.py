@@ -3,7 +3,9 @@ import socket
 import sys
 from urllib.parse import urlparse
 from tkinter import filedialog
-from core.graphics.common import utils, console
+from core.utility import utils
+from core.gui.main.components import console
+from core import __main__
 
 # preset file types for videos
 video_filetypes = ['.mp4', '.mov', '.wmv', '.avi', '.mkv', '.webm']
@@ -28,7 +30,7 @@ def prompt_update_default_save_directory():
 
     new_dir = filedialog.askdirectory(initialdir=default_save_directory, title='Update Default Save Location')
     if was_cancelled(new_dir):
-        console.printWarning('Cancelled *SaveDir update, *SaveDir will remain \"'+default_save_directory+"\"")
+        console.printWarning('Cancelled *SaveDir update, *SaveDir will remain \"' + default_save_directory + "\"")
         return
 
     default_save_directory = new_dir
@@ -56,12 +58,19 @@ def clean_filename(name):
     return fix
 
 
-# Used to retrieve asset files from a relative filepath.
+# Used to get a file.
 # Must use this when compiling to .exe using Pyinstaller.
-def resource_path(relative_path):
+def resource_path(filename):
     if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.abspath("."), relative_path)
+        return os.path.join(sys._MEIPASS, filename)
+    return os.path.join(os.path.abspath("."),  filename)
+
+
+# Used to retrieve files from the assets folder, by filename.
+def asset_path(filename):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, filename)
+    return os.path.join(os.path.abspath("."), "assets\\" + filename)
 
 
 # Contains metadata about a url.

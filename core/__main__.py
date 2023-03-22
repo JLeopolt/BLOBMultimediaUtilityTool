@@ -1,7 +1,7 @@
 # A multimedia utility downloader and converter tool which can download media sources from the Web.
 
 import core
-import core.graphics.gui as gui
+import core.gui.gui as gui
 
 
 def get_software_details():

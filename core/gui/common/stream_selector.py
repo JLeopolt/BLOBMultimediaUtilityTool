@@ -1,6 +1,6 @@
 from tkinter import ttk, StringVar
 
-from core.graphics.common import utils
+from core.utility import utils
 
 
 # An optionmenu which maintains a list of Streams behind-the-scenes.

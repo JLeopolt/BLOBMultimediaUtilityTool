@@ -4,10 +4,10 @@ import tkinter as tk
 from threading import Thread
 from tkinter import ttk
 
-from core.graphics.common import utils
-from core.graphics.common.progressbar import ProgressBar
-from core.graphics.main.modules.stream_selector import StreamSelector
-from core.services import youtube as yt, direct_file as dir_f, files
+from core.gui.common.progressbar import ProgressBar
+from core.gui.common.stream_selector import StreamSelector
+from core.tasks.load.services import direct_file as dir_f, youtube as yt
+from core.utility import utils, files
 
 # Note -- type-hints used to prevent warnings. These values are not initialized until build methods called.
 widget: ttk.LabelFrame

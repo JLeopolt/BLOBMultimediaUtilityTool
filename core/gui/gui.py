@@ -3,9 +3,9 @@ import webbrowser
 from tkinter import ttk
 
 from core import __main__ as mainpy
-from core.graphics.common import console
-from core.services import files
-from core.graphics.main import main_frame
+from core.gui.main.components import console
+from core.utility import files
+from core.gui.main import main_frame
 
 # The main application window.
 root: tk.Tk
@@ -22,7 +22,7 @@ def run():
     style = ttk.Style(root)
 
     # create window icon
-    ico = tk.PhotoImage(file=files.resource_path("assets/icon.png"))
+    ico = tk.PhotoImage(file=files.asset_path("icon.png"))
     root.wm_iconphoto(False, ico)
 
     # create main frame

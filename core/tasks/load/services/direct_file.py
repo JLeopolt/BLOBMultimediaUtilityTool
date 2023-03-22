@@ -6,9 +6,8 @@ import uuid
 from urllib import request
 import ffmpeg
 
-from core.services import files
-from core.graphics.common import console
-from core.graphics.main.modules import convert_widget
+from core.utility import files
+from core.gui.main.components import convert_widget, console
 
 cached_temp_files = []
 

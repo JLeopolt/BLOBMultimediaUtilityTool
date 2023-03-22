@@ -3,9 +3,8 @@
 from idlelib.tooltip import Hovertip
 from tkinter import ttk
 
-from core.graphics.main import main_frame
-from core.services import files
-
+from core.tasks import commands
+from core.utility import files
 
 # widget frame
 widget: ttk.Frame
@@ -28,15 +27,13 @@ def build(parent):
     s = ttk.Style()
     s.configure('scut.TButton', font=12)
 
-    # 25BA
     global run_button
-    run_button = ttk.Button(widget, text='\u25B6', width=2, style='scut.TButton', command=Run)
+    run_button = ttk.Button(widget, text='\u25B6', width=2, style='scut.TButton', command=commands.Run)
     run_button.pack(side='left', padx=1)
     Hovertip(run_button, '@Run: Execute the current process.')
 
-    # \u2421
     global clear_button
-    clear_button = ttk.Button(widget, text='\u2326', width=2, style='scut.TButton', command=Clear)
+    clear_button = ttk.Button(widget, text='\u2326', width=2, style='scut.TButton', command=commands.Clear)
     clear_button.pack(side='left', padx=1)
     Hovertip(clear_button, '@Clear: Clears output frame.')
 
@@ -46,12 +43,12 @@ def build(parent):
     global audio_hr_button
     audio_hr_button = ttk.Button(widget, text='\u266B', width=2, style='scut.TButton')
     audio_hr_button.pack(side='left', padx=1)
-    Hovertip(audio_hr_button, '@Audio: @Run \u27A1 Automatically download\naudio at highest resolution.')
+    Hovertip(audio_hr_button, '@Audio: @Load \u27A1 Automatically download\naudio at highest resolution.')
 
     global video_hr_button
     video_hr_button = ttk.Button(widget, text='\u2B73', width=2, style='scut.TButton')
     video_hr_button.pack(side='left', padx=1)
-    Hovertip(video_hr_button, '@Video: @Run \u27A1 Automatically download\nvideo & audio at highest '
+    Hovertip(video_hr_button, '@Video: @Load \u27A1 Automatically download\nvideo & audio at highest '
                               'resolution.')
 
     # Separator
@@ -95,14 +92,6 @@ def block_new_processes():
 def unblock_new_processes():
     enable_button(run_button)
     enable_button(clear_button)
-
-
-def Run():
-    main_frame.schedule_load_media()
-
-
-def Clear():
-    main_frame.clear()
 
 
 # Updates the Save Mode between ASK and AUTO, disabling the selected button.

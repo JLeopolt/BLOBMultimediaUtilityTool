@@ -4,9 +4,8 @@ import uuid
 import ffmpeg
 from pytube import YouTube
 
-from core.graphics.common import console
-from core.graphics.main.modules import convert_widget
-from core.services import files
+from core.gui.main.components import convert_widget, console
+from core.utility import files
 
 # Cached temporary streams.
 cached_temp_files = []

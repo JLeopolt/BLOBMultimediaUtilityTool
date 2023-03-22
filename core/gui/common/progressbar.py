@@ -1,5 +1,5 @@
 import tkinter.ttk as ttk
-from core.graphics.common import utils
+from core.utility import utils
 
 
 class ProgressBar(ttk.Frame):

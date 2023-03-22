@@ -3,11 +3,10 @@ from pytube.exceptions import RegexMatchError
 import requests
 
 import core
-from core.services import files, html, youtube
-from core.graphics.common import utils, console
-from core.graphics.main import shortcut_panel
-from core.graphics.main import main_frame
-from core.graphics.main.modules import metadata_widget, convert_widget
+from core.tasks.load.services import html
+from core.utility import utils, files
+from core.gui.main import main_frame
+from core.gui.main.components import metadata_widget, convert_widget, console, shortcut_panel
 
 
 # Processes the URL to determine which mode to process it with.

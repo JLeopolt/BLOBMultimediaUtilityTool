@@ -2,10 +2,7 @@ from idlelib.tooltip import Hovertip
 from threading import Thread
 from tkinter import ttk
 
-from core.graphics.common import console, utils
-from core.graphics.main import shortcut_panel as shortcuts
-from core.graphics.main.modules import convert_widget, metadata_widget
-from core.services import loader
+from core.gui.main.components import convert_widget, metadata_widget, console, shortcut_panel as shortcuts
 
 # the main widget
 widget: ttk.Frame
