@@ -13,11 +13,11 @@ All code, assets, and dependencies are bundled in the .EXE file, so it'll be rea
 ### Downloading (For Testing/Development)
 1. Install the latest version of <a href="https://www.python.org/downloads/">Python</a>. <br>
 2. Install and open Git Bash. <br>
-3. Navigate to the directory where you want the project installed.
+3. In Git Bash, navigate to the directory where you want the project installed.
 ```
 cd C:\Your\Specific\Directory
 ```
-4. Clone this repository.
+4. Then, clone this repository.
 ```
 git clone https://github.com/JLeopolt/MultimediaUtilityDownloadTool.git
 ```
