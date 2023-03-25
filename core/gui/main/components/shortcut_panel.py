@@ -41,12 +41,12 @@ def build(parent):
     ttk.Separator(widget, orient='vertical').pack(side='left', padx=8, fill='y')
 
     global audio_hr_button
-    audio_hr_button = ttk.Button(widget, text='\u266B', width=2, style='scut.TButton')
+    audio_hr_button = ttk.Button(widget, text='\u266B', width=2, style='scut.TButton', command=commands.AudioHR)
     audio_hr_button.pack(side='left', padx=1)
     Hovertip(audio_hr_button, '@Audio: @Load \u27A1 Automatically download\naudio at highest resolution.')
 
     global video_hr_button
-    video_hr_button = ttk.Button(widget, text='\u2B73', width=2, style='scut.TButton')
+    video_hr_button = ttk.Button(widget, text='\u2B73', width=2, style='scut.TButton', command=commands.VideoHR)
     video_hr_button.pack(side='left', padx=1)
     Hovertip(video_hr_button, '@Video: @Load \u27A1 Automatically download\nvideo & audio at highest '
                               'resolution.')

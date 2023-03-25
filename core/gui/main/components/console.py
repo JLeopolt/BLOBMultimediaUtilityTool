@@ -17,7 +17,7 @@ was_console_cleared = False
 # Create the console and add it to the specified container.
 def build(parent):
     global widget
-    widget = tk.scrolledtext.ScrolledText(parent, undo=True, wrap='word')
+    widget = tk.scrolledtext.ScrolledText(parent, undo=True, wrap='word', cursor="")
     widget.pack(side='bottom', expand=True, fill='both')
 
     # Redirect std to console using TextRedirector class.
@@ -44,11 +44,11 @@ def set_font(font):
 
 
 def print_startup_info():
-    # timestamp of console launch / clear
+    # timestamp of console launch / clear, and python version.
     if was_console_cleared:
-        printNotice("Console has been cleared.")
+        printNotice("Console (Python " + sys.version.split(" ")[0] + ") cleared.")
     else:
-        printNotice("Console started.")
+        printNotice("Console (Python " + sys.version.split(" ")[0] + ") started.")
 
     # print software / license info.
     printInfo(mainpy.get_software_details() + "\n" + mainpy.get_license_details())
@@ -64,7 +64,7 @@ def setup_console_tags():
     widget.tag_configure('stdout', background="white", foreground="blue")
     widget.tag_configure('stderr', background="white", foreground="red")
 
-    widget.tag_configure('link-open-file', background="white", foreground="blue", underline=True)
+    widget.tag_configure('link-open-file', background="purple", foreground="white", underline=True, justify='center')
     widget.tag_bind('link-open-file', '<Button-1>', link_open_file_location)
 
     # selection highlight should take priority over tags.
@@ -136,7 +136,7 @@ def clear():
 
 def addHyperlinkOpenFile(text, file_location):
     enable()
-    widget.insert('end', text + "\n", ('link-open-file', file_location))
+    widget.insert('end', "\n" + text + "\n\n", ('link-open-file', file_location))
     disable()
 
 

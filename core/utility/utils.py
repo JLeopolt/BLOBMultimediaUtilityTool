@@ -26,8 +26,7 @@ def convert_seconds_to_duration(seconds):
     duration = str(s)
     if s < 10:
         duration = "0" + duration
-    if m > 0:
-        duration = str(m) + ":" + duration
+    duration = str(m) + ":" + duration
     if h > 0:
         if m < 10:
             duration = "0" + duration

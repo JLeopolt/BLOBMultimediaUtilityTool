@@ -1,53 +1,42 @@
 import time
-from pytube.exceptions import RegexMatchError
+
 import requests
+from pytube.exceptions import RegexMatchError
 
-import core
-from core.tasks.load.services import html
+from core.gui.main.components import metadata_widget, convert_widget, console
+from core.tasks.services import html, youtube
 from core.utility import utils, files
-from core.gui.main import main_frame
-from core.gui.main.components import metadata_widget, convert_widget, console, shortcut_panel
 
 
-# Processes the URL to determine which mode to process it with.
-def load():
-    # Block new processes.
-    shortcut_panel.block_new_processes()
-
-    # Get the URL from user input field.
-    url = main_frame.link_entry_field.get()
+# Processes the URL, determines which mode to process it with. takes in url as parameter.
+# returns True if successful, false otherwise. May raise exception
+def run(url):
     if utils.trim(url) == '':
         console.printError("Please provide a URL.")
-        shortcut_panel.unblock_new_processes()
-        return
+        return False
 
+    # convert url
     url = files.URLMetadata(url)
 
     if url.isYoutube:
         # Treat the URL as a YouTube link.
-        load_youtube_video(url_meta=url)
-        return
+        return load_youtube_video(url_meta=url)
 
     # Open the URL and scan it's HTML Contents to find media files
-    load_scan(url_meta=url)
+    return load_scan(url_meta=url)
 
 
-# loads in the youtube video from link provided
-# should be called asynchronously.
+# Async, loads in the youtube video from link provided.
+# Returns True if successful, false otherwise. May raise exceptions
 def load_youtube_video(url_meta):
     start_time = time.time()
 
     # Get the metadata here.
     try:
-        youtube_obj = core.services.youtube.get_YouTube_object(url_meta.url)
+        youtube_obj = youtube.get_YouTube_object(url_meta.url)
     except RegexMatchError:
         console.printError("Invalid YouTube URL.")
-        shortcut_panel.unblock_new_processes()
-        return
-    except (Exception,) as e:
-        console.printError(str(e))
-        shortcut_panel.unblock_new_processes()
-        return
+        return False
 
     # builds the metadata frame
     metadata_widget.build_from_youtube(youtube_obj)
@@ -63,13 +52,11 @@ def load_youtube_video(url_meta):
     # Success message to notify the user
     console.printSuccess("Retrieved all available download streams for \"" + youtube_obj.title + "\" ("
                          + str(round(time.time() - mid_time, 2)) + "s).")
-
-    # Unblock shortcuts
-    shortcut_panel.unblock_new_processes()
+    return True
 
 
-# loads a File from the link provided.
-# should be called asynchronously.
+# Async, loads a File from the link provided.
+# Returns True if successful, False otherwise.
 def load_scan(url_meta):
     # check if the URL is valid.
     try:
@@ -78,8 +65,7 @@ def load_scan(url_meta):
             raise Exception
     except (Exception,):
         console.printError("Could not access URL. Ensure the URL is still active, then try again.")
-        shortcut_panel.unblock_new_processes()
-        return
+        return False
 
     # Start the progress bar
     start_time = time.time()
@@ -88,8 +74,7 @@ def load_scan(url_meta):
     vid_url = scanner.find_video()
     if vid_url is None:
         console.printError('Could not find an .mp4 video file at that URL.')
-        shortcut_panel.unblock_new_processes()
-        return
+        return False
     video_url_meta = files.URLMetadata(vid_url)
 
     # resets, then builds the metadata frame
@@ -98,7 +83,5 @@ def load_scan(url_meta):
     # Readies the Converter frame.
     convert_widget.build_from_file(video_url_meta)
 
-    # Unblock shortcuts
-    shortcut_panel.unblock_new_processes()
-
     console.printSuccess("Got file metadata. (" + str(round(time.time() - start_time, 2)) + "s)")
+    return True

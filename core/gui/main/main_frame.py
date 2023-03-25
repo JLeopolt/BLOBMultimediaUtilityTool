@@ -1,14 +1,11 @@
 from idlelib.tooltip import Hovertip
-from threading import Thread
 from tkinter import ttk
 
 from core.gui.main.components import convert_widget, metadata_widget, console, shortcut_panel as shortcuts
+from core.tasks import commands
 
 # the main widget
 widget: ttk.Frame
-
-# the thread which will perform any async task, one at a time.
-worker_thread = None
 
 # the entry field which contains the url
 link_entry_field: ttk.Entry
@@ -66,23 +63,8 @@ def build_input_frame():
     link_entry_field.pack(side='left', padx=3, expand=True, fill='x')
 
     # load button
-    load_button = ttk.Button(input_frame, text='Load', width=6, command=schedule_load_media)
+    load_button = ttk.Button(input_frame, text='Load', width=6, command=commands.Load_Async)
     Hovertip(load_button, 'Load source streams from URL.')
     load_button.pack(side='left', padx=3)
 
     return input_frame
-
-
-# Schedules to asynchronously load a media, using the task param as the function
-# automatically determines which URL Mode to use.
-def schedule_load_media():
-    global worker_thread
-
-    # cancel if a process is alr occurring.
-    if worker_thread is not None and worker_thread.is_alive():
-        console.printError('Please wait for the current process to finish before scheduling a new process.')
-        return
-
-    # load the media on a worker thread
-    worker_thread = Thread(target=loader.load, args=[])
-    worker_thread.start()

@@ -54,6 +54,25 @@ def build_from_youtube(youtube):
     tk.Label(metadata, text="Author: " + youtube.author).pack(side='top', expand=True, anchor='nw')
 
 
+def build_from_url(url_meta):
+    reset()
+
+    # The thumbnail image
+    thumbnail_image = create_thumbnail(files.asset_path("no-source.png"))
+    thumbnail = ttk.Label(widget, image=thumbnail_image)
+    thumbnail.pack(side='left', anchor='nw')
+
+    # Video metadata frame
+    metadata = tk.Frame(widget)
+    metadata.pack(side='left', anchor='nw')
+
+    # Get all metadata from the file URL without downloading it.
+    video_title_label = tk.Label(metadata, text="Filename: " + url_meta.filename)
+    video_title_label.pack(side='top', expand=True, anchor='nw')
+    tk.Label(metadata, text="Website: " + url_meta.domain).pack(side='top', expand=True, anchor='nw')
+    tk.Label(metadata, text="Resolved DNS: " + url_meta.host_addr).pack(side='top', expand=True, anchor='nw')
+
+
 # Creates a thumbnail from a URL.
 def create_thumbnail_from_url(thumbnail_url):
     # Creates a local temp-file for the thumbnail.
@@ -75,22 +94,3 @@ def create_thumbnail(filepath):
     urllib.request.urlcleanup()
 
     return thumbnail
-
-
-def build_from_url(url_meta):
-    reset()
-
-    # The thumbnail image
-    thumbnail_image = create_thumbnail(files.asset_path("no-source.png"))
-    thumbnail = ttk.Label(widget, image=thumbnail_image)
-    thumbnail.pack(side='left', anchor='nw')
-
-    # Video metadata frame
-    metadata = tk.Frame(widget)
-    metadata.pack(side='left', anchor='nw')
-
-    # Get all metadata from the file URL without downloading it.
-    video_title_label = tk.Label(metadata, text="Filename: " + url_meta.filename)
-    video_title_label.pack(side='top', expand=True, anchor='nw')
-    tk.Label(metadata, text="Website: " + url_meta.domain).pack(side='top', expand=True, anchor='nw')
-    tk.Label(metadata, text="Resolved DNS: " + url_meta.host_addr).pack(side='top', expand=True, anchor='nw')

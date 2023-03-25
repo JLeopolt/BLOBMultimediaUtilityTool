@@ -1,13 +1,13 @@
 # The display frame which allows the user to select a download stream, convert file types, etc.
 
 import tkinter as tk
-from threading import Thread
 from tkinter import ttk
 
 from core.gui.common.progressbar import ProgressBar
 from core.gui.common.stream_selector import StreamSelector
-from core.tasks.load.services import direct_file as dir_f, youtube as yt
-from core.utility import utils, files
+from core.gui.main.components import console
+from core.tasks.services import youtube as yt, direct_file as dir_f
+from core.utility import utils, files, executor
 
 # Note -- type-hints used to prevent warnings. These values are not initialized until build methods called.
 widget: ttk.LabelFrame
@@ -26,6 +26,9 @@ file_convert_type: tk.StringVar
 file_type_menu: ttk.OptionMenu
 custom_file_convert_type: tk.StringVar
 
+# Download function
+download_function: ()
+
 
 # Upon construction the frame is empty and won't show up until a specific build method is called.
 def build(parent):
@@ -38,6 +41,8 @@ def reset():
     utils.destroy_children(widget)
     # add an invisible widget to the frame to keep the border rendered.
     ttk.Frame(widget, width=0, height=0, borderwidth=0).pack()
+    # reset download function
+    reset_download_function()
 
 
 # resets the frame and builds it again, using a YouTube object as the source
@@ -71,8 +76,11 @@ def build_from_youtube(youtube):
     file_convert_frame = build_file_convert_frame(files.video_filetypes)
     file_convert_frame.pack(side='left', expand=True)
 
+    # Defines which function and args to use for downloading.
+    set_download_function(yt.download, youtube)
+
     # the final request can be submitted in this section
-    finish_frame = build_finish_frame(yt.download, youtube)
+    finish_frame = build_finish_frame()
     finish_frame.pack(side='left', expand=True)
 
 
@@ -99,8 +107,11 @@ def build_from_file(url_meta):
     file_convert_frame = build_file_convert_frame(files.video_filetypes)
     file_convert_frame.pack(side='left', expand=True)
 
+    # Defines which function and args to use for downloading.
+    set_download_function(dir_f.download, url_meta)
+
     # the final request can be submitted in this section
-    finish_frame = build_finish_frame(dir_f.download, url_meta)
+    finish_frame = build_finish_frame()
     finish_frame.pack(side='left', expand=True)
 
 
@@ -220,19 +231,34 @@ def reset_custom_type_entrybox(value):
     file_type_menu.focus()
 
 
+# Should be called before building finish frame.
+def set_download_function(funct, data):
+    global download_function
+    download_function = (funct, data)
+
+
+def reset_download_function():
+    global download_function
+    download_function = None
+
+
+# Async, called by subcommands, triggers download automatically.
+# Performs the download on a new thread. Does NOT use the main process worker thread.
+def execute_download():
+    if download_function is None:
+        console.printError("Cannot execute download since no function is declared.")
+        return
+    # use a 'download' thread, instead of process thread.
+    executor.perform_download(download_function[0], download_function[1])
+
+
 # the final request can be submitted in this section
-def build_finish_frame(funct, data):
+def build_finish_frame():
     finish_frame = ttk.Frame(widget)
     ttk.Label(finish_frame, text='Finish').pack()
 
-    ttk.Button(finish_frame, text='Download', command=lambda: async_download(funct, data)).pack()
+    ttk.Button(finish_frame, text='Download', command=execute_download).pack()
     return finish_frame
-
-
-def async_download(funct, data):
-    # execute on a new thread
-    worker_thread = Thread(target=funct, args=[data])
-    worker_thread.start()
 
 
 # returns the filename in form: <filename>.<extension>

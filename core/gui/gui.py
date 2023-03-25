@@ -18,7 +18,7 @@ def run():
 
     # root window
     root.title(mainpy.get_software_details())
-    root.geometry('600x700')
+    default_geometry()
     style = ttk.Style(root)
 
     # create window icon
@@ -33,6 +33,11 @@ def run():
 
     # finally, execute the window
     root.mainloop()
+
+
+# restores the window size to default.
+def default_geometry():
+    root.geometry('600x700')
 
 
 # helper method which sets up the top Menubar of the window.
@@ -73,6 +78,8 @@ def configure_menubar(style):
     fonts_submenu = tk.Menu(file_menu, tearoff=0)
     fonts_submenu.add_command(label="Set Console Font", command=console.open_font_selector)
     styles_menu.add_cascade(label="Fonts", menu=fonts_submenu)
+
+    styles_menu.add_command(label="Reset Window Size", command=default_geometry)
 
     menubar.add_cascade(label="Styles", menu=styles_menu)
 
