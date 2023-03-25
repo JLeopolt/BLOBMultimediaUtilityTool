@@ -58,5 +58,5 @@ This project is licensed under **GNU GPL-3.0** - see the [LICENSE.md](LICENSE.md
 If you have any inquiries, contact us <a href="https://www.pyroneon.ml/contact-us/email">here</a>.<br>
 Visit the official website for MUD Tool <a href="https://www.pyroneon.ml/mudtool">here</a>.
 
-###Disclaimer:
+### Disclaimer:
 Please do not illegally download copyrighted content such as music or movies using this software.
