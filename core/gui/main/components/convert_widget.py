@@ -38,6 +38,7 @@ def build(parent):
 
 
 def reset():
+    # destroy children
     utils.destroy_children(widget)
     # add an invisible widget to the frame to keep the border rendered.
     ttk.Frame(widget, width=0, height=0, borderwidth=0).pack()

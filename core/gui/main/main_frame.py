@@ -41,8 +41,8 @@ def clear():
     metadata_widget.reset()
     convert_widget.reset()
     # destroy the widget and rebuild it
-    widget.destroy()
-    build(widget.master)
+    # widget.destroy()
+    # build(widget.master)
 
 
 # returns all the input controls in a single Frame.

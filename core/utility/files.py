@@ -69,7 +69,7 @@ def resource_path(filename):
 # Used to retrieve files from the assets folder, by filename.
 def asset_path(filename):
     if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, filename)
+        return os.path.join(sys._MEIPASS, "assets\\" + filename)
     return os.path.join(os.path.abspath("."), "assets\\" + filename)
 
 
