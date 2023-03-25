@@ -37,6 +37,13 @@ It should be in the SAME FOLDER as the "__ main __.py" file!
 ```
 10. To launch the program, just run "__ main __.py"!
 
+## To-Do List
+* Add support for custom plugins.
+* Allow users to save and import/export settings.
+* Allow users to input custom FFMPEG flags for operations.
+* Support for YouTube playlists and automating URL input.
+* Support output media file metadata tagging with FFMPEG.
+
 ## Authors
 [JLeopolt](https://github.com/JLeopolt) - *Developer*
 
