@@ -12,8 +12,8 @@ widget: ttk.Frame
 # shortcut buttons
 run_button: ttk.Button
 clear_button: ttk.Button
-audio_hr_button: ttk.Button
-video_hr_button: ttk.Button
+audio_button: ttk.Button
+video_button: ttk.Button
 save_ask_btn: ttk.Button
 save_auto_btn: ttk.Button
 set_savedir_btn: ttk.Button
@@ -40,15 +40,15 @@ def build(parent):
     # Separator
     ttk.Separator(widget, orient='vertical').pack(side='left', padx=8, fill='y')
 
-    global audio_hr_button
-    audio_hr_button = ttk.Button(widget, text='\u266B', width=2, style='scut.TButton', command=commands.AudioHR)
-    audio_hr_button.pack(side='left', padx=1)
-    Hovertip(audio_hr_button, '@Audio: @Load \u27A1 Automatically download\naudio at highest resolution.')
+    global audio_button
+    audio_button = ttk.Button(widget, text='\u266B', width=2, style='scut.TButton', command=commands.Audio)
+    audio_button.pack(side='left', padx=1)
+    Hovertip(audio_button, '@Audio: @Load \u27A1 Automatically download\naudio at highest resolution.')
 
-    global video_hr_button
-    video_hr_button = ttk.Button(widget, text='\u2B73', width=2, style='scut.TButton', command=commands.VideoHR)
-    video_hr_button.pack(side='left', padx=1)
-    Hovertip(video_hr_button, '@Video: @Load \u27A1 Automatically download\nvideo & audio at highest '
+    global video_button
+    video_button = ttk.Button(widget, text='\u2B73', width=2, style='scut.TButton', command=commands.Video)
+    video_button.pack(side='left', padx=1)
+    Hovertip(video_button, '@Video: @Load \u27A1 Automatically download\nvideo & audio at highest '
                               'resolution.')
 
     # Separator

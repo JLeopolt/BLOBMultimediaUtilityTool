@@ -31,13 +31,13 @@ def Load_Sync():
 
 
 # Loads -> Auto download Video at highest res.
-def VideoHR():
+def Video():
     # Asynchronously executes chain command.
     executor.execute_process(Chain, [(Load_Sync, None), (subcoms.auto_download_hr, 0)])
 
 
 # Loads -> Auto download audio at highest res.
-def AudioHR():
+def Audio():
     # Asynchronously executes chain command.
     executor.execute_process(Chain, [(Load_Sync, None), (subcoms.auto_download_hr, 1)])
 
