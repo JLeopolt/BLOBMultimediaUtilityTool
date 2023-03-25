@@ -39,6 +39,7 @@ It should be in the SAME FOLDER as the "__ main __.py" file!
 
 ## To-Do List
 * Add support for custom plugins.
+* Overhaul scanning feature.
 * Allow users to save and import/export settings.
 * Allow users to input custom FFMPEG flags for operations.
 * Support for YouTube playlists and automating URL input.
