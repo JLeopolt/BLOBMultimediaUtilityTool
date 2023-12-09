@@ -1,4 +1,15 @@
-# Multimedia Utility Download Tool
+# Multimedia Utility Download Tool (Deprecated)
+
+## Notice: This project is now deprecated.
+MUD Tool will no longer be maintained by PyroNeon Software. Development on this project is being indefinitely suspended.
+
+## Alternative Programs:
+- FetchV (<a href="https://chromewebstore.google.com/detail/fetchvvideo-downloaderhls/imleiiaoeclikefimmcdkjabjbpcdgaj">Chrome Store</a>)
+A very powerful chrome/edge extension which automatically scans webpages for m3u8, blob, or mp4 video stream sources, and provides a simple, user-friendly GUI to download files. It is very effective, completely free, and non-intrusive. I (JLeopolt) personally use this extension, and it captures exactly what MUD Tool should have been.
+- yt-dlp (<a href="https://github.com/yt-dlp/yt-dlp">GitHub Page</a>)
+An extremely versatile CLI youtube downloader. It provides an endless amount of options and parameters, meant for power users. When it comes to downloading from youtube, this is by far the best tool, although it would be quite difficult for a novice or casual user to grasp. If you're a power user or developer, this is the perfect solution for you.
+- Media Downloader (<a href="https://github.com/mhogomchungu/media-downloader">GitHub Page</a>)
+A user-friendly GUI alternative to yt-dlp. This software is basically just a fancy GUI wrapper for yt-dlp, but it really is a lot simpler to use. It has good configuration support and allows you to do things like download bulk youtube playlists or hundreds of videos at a time automatically, without having to figure out all of the command options like with yt-dlp. Highly recommended for normal people and non-devs.
 
 ## About
 MUD Tool (Multimedia Utility Download Tool) is a powerful program which allows you to download and convert media files from the web. If you've ever been browsing the web and wanted to download a video, but it's locked behind a paywall or asks you to sign up to download, just use the MUD Tool!
@@ -57,7 +68,7 @@ This project is licensed under **GNU GPL-3.0** - see the [LICENSE.md](LICENSE.md
 
 ## Contact Us
 If you have any inquiries, contact us <a href="https://www.pyroneon.net/contact-us/email">here</a>.<br>
-Visit the official website for MUD Tool <a href="https://www.pyroneon.net/mudtool">here</a>.
+Visit the official website for MUD Tool <a href="https://www.pyroneon.net/experimental/mudtool">here</a>.
 
 ### Disclaimer:
 Please do not illegally download copyrighted content such as music or movies using this software.
