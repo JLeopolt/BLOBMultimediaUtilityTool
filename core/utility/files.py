@@ -1,11 +1,11 @@
 import os
 import socket
 import sys
-from urllib.parse import urlparse
 from tkinter import filedialog
-from core.utility import utils
+from urllib.parse import urlparse
+
 from core.gui.main.components import console
-from core import __main__
+from core.utility import utils
 
 # preset file types for videos
 video_filetypes = ['.mp4', '.mov', '.wmv', '.avi', '.mkv', '.webm']

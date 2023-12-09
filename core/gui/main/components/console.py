@@ -46,7 +46,7 @@ def set_font(font):
 def print_startup_info():
     # timestamp of console launch / clear, and python version.
     if was_console_cleared:
-        printNotice("Console cleared. (Python" + mainpy.get_python_version() + ")")
+        printNotice("Console cleared. (Python " + mainpy.get_python_version() + ")")
     else:
         printNotice("Console started. (Python " + mainpy.get_python_version() + ")")
 

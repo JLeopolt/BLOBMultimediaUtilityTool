@@ -85,7 +85,7 @@ def configure_menubar(style):
 
     # Prepare HelpMenu
     help_menu = tk.Menu(menubar, tearoff=0)
-    help_menu.add_command(label="About", command=lambda: webbrowser.open('https://www.pyroneon.ml/mudtool'))
+    help_menu.add_command(label="About", command=lambda: webbrowser.open('https://www.pyroneon.net/experimental/mudtool'))
     menubar.add_cascade(label="Help", menu=help_menu)
 
     # Add the Menu to window
